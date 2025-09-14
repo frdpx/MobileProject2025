@@ -4,9 +4,9 @@ import { ChartScreen } from "../pages/ChartScreen";
 import { ProfileScreen } from "../pages/ProfileScreen";
 const Tab = createBottomTabNavigator();
 
-const BottomTab = () => {
+export const MainTabNavigator = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Chart" component={ChartScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

@@ -1,8 +1,9 @@
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 export const LogInScreen = () => {
   return (
-    <View>
-      <></>
-    </View>
+    <SafeAreaView>
+      <Text>Log In Screen</Text>
+    </SafeAreaView>
   );
 };
