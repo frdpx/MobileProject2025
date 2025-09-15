@@ -1,0 +1,58 @@
+export const transactions = [
+  {
+    category: "Salary",
+    date: "Today",
+    amount: 5900,
+    comment: "abcd",
+    type: "income",
+  },
+  {
+    category: "Food",
+    date: "Today",
+    amount: 780,
+    comment: "abcd",
+    type: "expense",
+  },
+  {
+    category: "Gift",
+    date: "Today",
+    amount: 590,
+    comment: "abcd",
+    type: "expense",
+  },
+  {
+    category: "Salary",
+    date: "Today",
+    amount: 5900,
+    comment: "abcd",
+    type: "income",
+  },
+  {
+    category: "Sport",
+    date: "Today",
+    amount: 780,
+    comment: "abcd",
+    type: "expense",
+  },
+  {
+    category: "Other",
+    date: "Today",
+    amount: 780,
+    comment: "abcd",
+    type: "expense",
+  },
+  {
+    category: "Medical",
+    date: "Today",
+    amount: 780,
+    comment: "abcd",
+    type: "expense",
+  },
+  {
+    category: "Travel",
+    date: "Today",
+    amount: 780,
+    comment: "abcd",
+    type: "expense",
+  },
+];
