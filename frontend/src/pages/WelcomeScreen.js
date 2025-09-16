@@ -1,15 +1,11 @@
 import { View, Image, StyleSheet, Text } from "react-native";
-import {
-  useFonts,
-  AlfaSlabOne_400Regular,
-} from "@expo-google-fonts/alfa-slab-one";
+import { useFonts } from "@expo-google-fonts/alfa-slab-one";
 import Images from "../constants/images";
 import Button from "../components/Button";
+import { fontConfig, fontFamilies } from "../constants/fonts";
 
 export const WelcomeScreen = ({ navigation }) => {
-  const [fontsLoaded] = useFonts({
-    AlfaSlabOne: AlfaSlabOne_400Regular,
-  });
+  const [fontsLoaded] = useFonts(fontConfig);
 
   if (!fontsLoaded) {
     return null;
@@ -55,7 +51,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     textAlign: "center",
-    fontFamily: "AlfaSlabOne",
+    fontFamily: fontFamilies.app_name,
     marginTop: 20,
   },
   subtitle: {
