@@ -12,7 +12,7 @@ const BalanceCard = ({ balance }) => {
         <View style={styles.row}>
           <View style={styles.col}>
             <View style={styles.rowCenter}>
-              <Ionicons name="arrow-down-circle" size={16} color="lightgreen" />
+              <Ionicons name="arrow-up-circle" size={16} color="lightgreen" />
               <Text style={[styles.label, { color: "lightgreen" }]}>
                 Income
               </Text>
@@ -22,7 +22,7 @@ const BalanceCard = ({ balance }) => {
 
           <View style={[styles.col, { alignItems: "flex-end" }]}>
             <View style={styles.rowCenter}>
-              <Ionicons name="arrow-up-circle" size={16} color="salmon" />
+              <Ionicons name="arrow-down-circle" size={16} color="salmon" />
               <Text style={[styles.label, { color: "salmon" }]}>Expenses</Text>
             </View>
             <Text style={styles.value}>
