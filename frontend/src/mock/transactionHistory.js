@@ -21,7 +21,7 @@ export const transactions = [
     type: "expense",
   },
   {
-    category: "Salary",
+    category: "Bonus",
     date: "2025-09-13T09:00:00Z",
     amount: 5900,
     comment: "abcd4",
@@ -35,7 +35,7 @@ export const transactions = [
     type: "expense",
   },
   {
-    category: "Other",
+    category: "Other Expense",
     date: "2025-09-12T10:15:00Z",
     amount: 780,
     comment: "abcd6",
@@ -63,7 +63,7 @@ export const transactions = [
     type: "expense",
   },
   {
-    category: "Salary",
+    category: "Additional Income",
     date: "2025-09-03T09:00:00Z",
     amount: 5900,
     comment: "abcd10",

@@ -1,6 +1,6 @@
 import { View, Image, StyleSheet, Text } from "react-native";
 import { useFonts } from "@expo-google-fonts/alfa-slab-one";
-import Images from "../constants/images";
+import { Images } from "../constants/images";
 import Button from "../components/Button";
 import { fontConfig, fontFamilies } from "../constants/fonts";
 
