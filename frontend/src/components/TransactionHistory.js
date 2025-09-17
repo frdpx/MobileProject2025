@@ -11,6 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { formatDate } from "../utils/formatDate";
+import { categoryIcons, defaultIcon } from "../constants/icons";
+import { normalizeKey } from "../utils/string";
 
 const TransactionHistory = ({ data }) => {
   const latest = [...data]
@@ -58,28 +60,9 @@ const TransactionHistory = ({ data }) => {
   };
 
   const renderItem = ({ item, index }) => {
-    const icon = item.category.toLowerCase();
     const iconColor = item.type === "income" ? "#C8F7C5" : "#FADBD8";
-    const iconName =
-      icon === "salary"
-        ? "wallet"
-        : icon === "food"
-        ? "fast-food"
-        : icon === "gift"
-        ? "gift"
-        : icon === "shopping"
-        ? "cart"
-        : icon === "travel"
-        ? "airplane"
-        : icon === "medical"
-        ? "bandage"
-        : icon === "party"
-        ? "beer"
-        : icon === "sport"
-        ? "barbell"
-        : icon === "other"
-        ? "heart"
-        : "pricetag";
+    const category = normalizeKey(item.category);
+    const iconName = categoryIcons[category] || defaultIcon;
 
     const isExpanded = detailIndex === index;
 
