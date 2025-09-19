@@ -4,16 +4,23 @@ import { transactions } from "../mock/transactionHistory";
 import Header from "../components/Header";
 import ChartTabs from "../components/ChartTabs";
 import PieChartCard from "../components/PieChartCard";
+import MonthDropdown from "../components/MonthDropDown";
+import SummaryCard from "../components/SummaryCard";
 
 export const ChartScreen = () => {
   const [activeTab, setActiveTab] = useState("total");
+  const [month, setMonth] = useState("09");
 
   return (
     <View style={styles.container}>
-      <Header balance={10870} />
+      <Header balance={12255} />
       <ChartTabs activeTab={activeTab} onChangeTab={setActiveTab} />
+      <View style={styles.dropdown}>
+        <MonthDropdown value={month} onChange={setMonth} width={160} />
+      </View>
       <View style={styles.chartWrapper}>
         <PieChartCard transactions={transactions} tab={activeTab} />
+        <SummaryCard summary={{ Day: 220, Week: 1060, Month: 4520 }} />
       </View>
     </View>
   );
@@ -27,5 +34,10 @@ const styles = StyleSheet.create({
   chartWrapper: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  dropdown: {
+    alignItems: "flex-end",
+    marginRight: 20,
+    marginTop: 10,
   },
 });

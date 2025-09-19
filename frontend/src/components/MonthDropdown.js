@@ -1,5 +1,5 @@
 import { Months } from "../constants/months";
-import Dropdown from "./Dropdown";
+import Dropdown from "./DropDown";
 
 const MonthDropdown = ({ value, onChange, width }) => {
   return (
@@ -9,6 +9,7 @@ const MonthDropdown = ({ value, onChange, width }) => {
       onChange={onChange}
       placeHolder="Month"
       width={width}
+      maxHeight={220}
     />
   );
 };

@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const Dropdown = ({
@@ -38,7 +31,7 @@ const Dropdown = ({
         <Ionicons
           name={open ? "chevron-up" : "chevron-down"}
           size={18}
-          color="#333"
+          color="#a9799dff"
         />
       </Pressable>
 
@@ -59,7 +52,7 @@ const Dropdown = ({
               >
                 <Text style={styles.itemText}>{opt.label}</Text>
                 {selectedValue === opt.value && (
-                  <Ionicons name="checkmark" size={16} color="#8f1717ff" />
+                  <Ionicons name="checkmark" size={16} color="#a9799dff" />
                 )}
               </Pressable>
             ))}
@@ -77,7 +70,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   button: {
-    backgroundColor: "#d0ceceff",
+    backgroundColor: "#e8e8e8ff",
     borderRadius: 14,
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -91,11 +84,22 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    color: "#333",
+    color: "#494949ff",
     flexShrink: 1,
   },
   menu: {
     position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
+    backgroundColor: "#ffffffff",
+    borderRadius: 8,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    zIndex: 200,
   },
   item: {
     paddingVertical: 10,
@@ -109,6 +113,6 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    color: "#333",
+    color: "#2b2b2bff",
   },
 });
