@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Background from "../components/Background";
 import BalanceCard from "../components/TotalCard";
@@ -16,6 +16,24 @@ export const HomeScreen = () => {
   const handleAddButtonPressed = () => {
     navigation.navigate("AddTransactions");
   };
+
+  const handleEditTransaction = (item) => {
+    navigation.navigate("AddTransactions");
+  };
+
+  const handleDeleteTransaction = (item) => {
+    Alert.alert("confirm delete", "are u sure u want to delete?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          console.log("already deleted");
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Background firstname="MooDeng" lastname="Safariworld" />
@@ -35,7 +53,11 @@ export const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.history}>
-        <TransactionHistory data={transactions} />
+        <TransactionHistory
+          data={transactions}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteTransaction}
+        />
       </View>
     </SafeAreaView>
   );
