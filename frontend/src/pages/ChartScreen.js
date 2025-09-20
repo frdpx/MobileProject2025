@@ -1,12 +1,12 @@
 import { View, StyleSheet } from "react-native";
 import { useState } from "react";
 import { transactions } from "../mock/transactionHistory";
-import Header from "../components/Header";
-import ChartTabs from "../components/ChartTabs";
-import PieChartCard from "../components/PieChartCard";
-import MonthDropdown from "../components/MonthDropDown";
-import SummaryCard from "../components/SummaryCard";
-import CategoryList from "../components/CategoryList";
+import Header from "../components/common/Header";
+import ChartTabs from "../components/chart/ChartTabs";
+import PieChartCard from "../components/chart/PieChartCard";
+import MonthDropdown from "../components/chart/MonthDropdown";
+import SummaryCard from "../components/chart/SummaryCard";
+import CategoryList from "../components/chart/CategoryList";
 
 export const ChartScreen = () => {
   const [activeTab, setActiveTab] = useState("total");
