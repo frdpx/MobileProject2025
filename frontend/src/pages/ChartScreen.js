@@ -6,6 +6,7 @@ import ChartTabs from "../components/ChartTabs";
 import PieChartCard from "../components/PieChartCard";
 import MonthDropdown from "../components/MonthDropDown";
 import SummaryCard from "../components/SummaryCard";
+import CategoryList from "../components/CategoryList";
 
 export const ChartScreen = () => {
   const [activeTab, setActiveTab] = useState("total");
@@ -21,6 +22,7 @@ export const ChartScreen = () => {
       <View style={styles.chartWrapper}>
         <PieChartCard transactions={transactions} tab={activeTab} />
         <SummaryCard summary={{ Day: 220, Week: 1060, Month: 4520 }} />
+        <CategoryList transactions={transactions} tab={activeTab} />
       </View>
     </View>
   );
@@ -34,10 +36,11 @@ const styles = StyleSheet.create({
   chartWrapper: {
     flex: 1,
     paddingHorizontal: 20,
+    marginVertical: 5,
   },
   dropdown: {
     alignItems: "flex-end",
     marginRight: 20,
-    marginTop: 10,
+    marginTop: 5,
   },
 });

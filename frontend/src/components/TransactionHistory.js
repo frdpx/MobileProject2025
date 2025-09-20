@@ -14,7 +14,7 @@ import { formatDate } from "../utils/formatDate";
 import { categoryIcons, defaultIcon } from "../constants/icons";
 import { normalizeKey } from "../utils/string";
 
-const TransactionHistory = ({ data }) => {
+const TransactionHistory = ({ data, onEdit, onDelete }) => {
   const latest = [...data]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 10);
@@ -33,9 +33,9 @@ const TransactionHistory = ({ data }) => {
           if (buttonImdex === 1) {
             setDetailIndex(detailIndex === index ? null : index);
           } else if (buttonImdex === 2) {
-            Alert.alert("Edit pressed", `Edit ${item.category}  `);
+            onEdit?.(item);
           } else if (buttonImdex === 3) {
-            Alert.alert("Delete pressed", `Delete ${item.category}  `);
+            onDelete?.(item);
           }
         }
       );
@@ -48,8 +48,12 @@ const TransactionHistory = ({ data }) => {
             text: "View Comment",
             onPress: () => setDetailIndex(detailIndex === index ? null : index),
           },
-          { text: "Edit", onPress: () => Alert.alert("Edit", item.category) },
-          { text: "Delete", style: "destructive" },
+          { text: "Edit", onPress: () => onEdit?.(item) },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => onDelete?.(item),
+          },
           { text: "Cancel", style: "cancel" },
         ],
         {
