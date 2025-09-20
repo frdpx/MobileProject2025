@@ -1,8 +1,9 @@
 import { View, Image, StyleSheet, Text } from "react-native";
 import { useFonts } from "@expo-google-fonts/alfa-slab-one";
 import { Images } from "../constants/images";
-import Button from "../components/Button";
+
 import { fontConfig, fontFamilies } from "../constants/fonts";
+import Button from "../components/common/Button";
 
 export const WelcomeScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts(fontConfig);
@@ -28,8 +29,20 @@ export const WelcomeScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.button}>
-        <Button title="Log In" onPress={LogInButtonPressed} />
-        <Button title="Sign Up" onPress={SignUpButtonPressed} />
+        <Button
+          title="Log In"
+          onPress={LogInButtonPressed}
+          width={"70%"}
+          color={"black"}
+          textColor={"#fff"}
+        />
+        <Button
+          title="Sign Up"
+          onPress={SignUpButtonPressed}
+          width={"70%"}
+          color={"gray"}
+          textColor={"#fff"}
+        />
       </View>
     </View>
   );

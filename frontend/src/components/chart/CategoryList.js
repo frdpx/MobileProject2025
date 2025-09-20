@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { groupTransactionByCategory } from "../utils/groupTransaction";
+import { groupTransactionByCategory } from "../../utils/groupTransaction";
 
 const CategoryList = ({ transactions, tab }) => {
   const data = groupTransactionByCategory(transactions, tab);

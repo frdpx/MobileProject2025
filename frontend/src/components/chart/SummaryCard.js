@@ -11,7 +11,7 @@ const Summary = ({ label, value }) => {
 };
 
 const SummaryCard = ({ summary }) => {
-  const [month, setMonth] = useState("Month");
+  const [month, setMonth] = useState("09");
 
   return (
     <View style={styles.row}>
@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 5,
+    paddingVertical: 10,
   },
   card: {
     backgroundColor: "#f2f2f2",

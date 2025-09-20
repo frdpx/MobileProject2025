@@ -1,5 +1,5 @@
-import { Months } from "../constants/months";
-import Dropdown from "./DropDown";
+import { Months } from "../../constants/months";
+import Dropdown from "../common/Dropdown";
 
 const MonthDropdown = ({ value, onChange, width }) => {
   return (

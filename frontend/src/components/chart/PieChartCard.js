@@ -1,6 +1,6 @@
 import { View, StyleSheet, Dimensions, Text } from "react-native";
 import { PieChart } from "react-native-chart-kit";
-import { groupTransactionByCategory } from "../utils/groupTransaction";
+import { groupTransactionByCategory } from "../../utils/groupTransaction";
 
 const screenWidth = Dimensions.get("window").width;
 

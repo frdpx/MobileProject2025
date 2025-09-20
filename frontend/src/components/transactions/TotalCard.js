@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const BalanceCard = ({ balance }) => {
+const TotalCard = ({ balance }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
@@ -35,7 +35,7 @@ const BalanceCard = ({ balance }) => {
   );
 };
 
-export default BalanceCard;
+export default TotalCard;
 
 const styles = StyleSheet.create({
   wrapper: {

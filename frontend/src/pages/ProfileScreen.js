@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import Header from "../components/Header";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { mockUser } from "../mock/mockUser"; 
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { mockUser } from "../mock/mockUser";
 import { balanceData } from "../mock/balanceData"; // import balanceData
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import Header from "../components/common/Header";
 
 export const ProfileScreen = () => {
-  
   const navigation = useNavigation();
 
   const [firstName, setFirstName] = useState(mockUser.firstName);
@@ -18,7 +24,7 @@ export const ProfileScreen = () => {
   const handleSignOut = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'WelcomeScreen' }],
+      routes: [{ name: "WelcomeScreen" }],
     });
   };
 
@@ -32,9 +38,12 @@ export const ProfileScreen = () => {
       </View>
 
       <View style={styles.inputGroup}>
-        
         <Text>Username</Text>
-        <TextInput style={styles.input} value={mockUser.username} editable={false} />
+        <TextInput
+          style={styles.input}
+          value={mockUser.username}
+          editable={false}
+        />
 
         <Text>First Name</Text>
         <TextInput
@@ -62,7 +71,7 @@ export const ProfileScreen = () => {
         <TextInput
           style={styles.input}
           value={mockUser.dateOfBirth}
-          editable={false}  
+          editable={false}
         />
       </View>
 
@@ -75,10 +84,23 @@ export const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor: '#fff'},
-  profileHeader: { alignItems:'center', marginVertical:20 },
-  fullName: { fontSize:20, fontWeight:'bold', marginTop:10 },
-  inputGroup: { marginVertical:20, paddingHorizontal: 20 },
-  input: { borderWidth:1, borderColor:'#ccc', borderRadius:5, padding:10, marginBottom:15 },
-  signOutBtn: { flexDirection:'row', alignItems:'center', justifyContent:'center', padding:15, backgroundColor:'#eee', borderRadius:10 }
+  container: { flex: 1, backgroundColor: "#fff" },
+  profileHeader: { alignItems: "center", marginVertical: 20 },
+  fullName: { fontSize: 20, fontWeight: "bold", marginTop: 10 },
+  inputGroup: { marginVertical: 20, paddingHorizontal: 20 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  signOutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 15,
+    backgroundColor: "#eee",
+    borderRadius: 10,
+  },
 });

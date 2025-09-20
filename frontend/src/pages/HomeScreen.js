@@ -1,12 +1,12 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Background from "../components/Background";
-import BalanceCard from "../components/TotalCard";
+import Background from "../components/common/Background";
+import TotalCard from "../components/transactions/TotalCard";
 import { balanceData } from "../mock/balanceData";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import TransactionHistory from "../components/TransactionHistory";
+import TransactionHistory from "../components/transactions/TransactionHistory";
 import { transactions } from "../mock/transactionHistory";
 
 export const HomeScreen = () => {
@@ -37,7 +37,7 @@ export const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Background firstname="MooDeng" lastname="Safariworld" />
-      <BalanceCard balance={balanceData} />
+      <TotalCard balance={balanceData} />
       <View style={styles.addButton}>
         <TouchableOpacity
           onPressIn={() => setPressed(true)}
