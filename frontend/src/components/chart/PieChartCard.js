@@ -1,19 +1,17 @@
 import { View, StyleSheet, Dimensions, Text } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { groupTransactionByCategory } from "../../utils/groupTransaction";
+import { isEmptyTransactions } from "../../utils/isEmpty";
 
 const screenWidth = Dimensions.get("window").width;
 
-const PieChartCard = ({ transactions, tab }) => {
-  const pieData = groupTransactionByCategory(transactions, tab).map((item) => ({
-    name: item.name,
-    amount: item.amount,
-    color: item.color,
-    legendFontColor: "#333",
-    legendFontSize: 12,
-  }));
-
-  if (pieData.length === 0) {
+const PieChartCard = ({ transactions, tab, month, year }) => {
+  const pieData = groupTransactionByCategory(transactions, tab, month, year);
+  // const isEmpty =
+  //   !pieData ||
+  //   pieData.length === 0 ||
+  //   pieData.every((item) => item.amount === 0);
+  if (isEmptyTransactions(pieData)) {
     return <Text style={styles.noData}>No data</Text>;
   }
 
@@ -63,6 +61,6 @@ const styles = StyleSheet.create({
   },
   noData: {
     textAlign: "center",
-    marginTop: 20,
+    marginVertical: 50,
   },
 });

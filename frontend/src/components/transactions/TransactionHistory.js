@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { formatDate } from "../../utils/formatDate";
+import { formatDate } from "../../utils/dateUtils";
 import { categoryIcons, defaultIcon } from "../../constants/icons";
 import { normalizeKey } from "../../utils/string";
 

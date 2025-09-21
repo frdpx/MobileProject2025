@@ -18,3 +18,17 @@ export const formatDate = (iso) => {
     year: "numeric",
   });
 };
+
+export const this_month = new Date().getMonth();
+export const this_year = new Date().getFullYear();
+
+export const filterTransactionsByMonth = (
+  transactions,
+  month = new Date().getUTCMonth(),
+  year = new Date().getUTCFullYear()
+) => {
+  return transactions.filter((t) => {
+    const d = new Date(t.date);
+    return d.getUTCMonth() === month && d.getUTCFullYear() === year;
+  });
+};
