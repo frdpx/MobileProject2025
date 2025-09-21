@@ -1,13 +1,15 @@
 import { categoryColors } from "../constants/colors";
 import { categoryIcons, defaultIcon } from "../constants/icons";
+import { filterTransactionsByMonth } from "./dateUtils";
 
-export const groupTransactionByCategory = (transactions, tab) => {
+export const groupTransactionByCategory = (transactions, tab, month, year) => {
+  const currentMonthTsx = filterTransactionsByMonth(transactions, month, year);
   if (tab === "total") {
-    const income = transactions
+    const income = currentMonthTsx
       .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const expense = transactions
+    const expense = currentMonthTsx
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + t.amount, 0);
 
@@ -16,20 +18,20 @@ export const groupTransactionByCategory = (transactions, tab) => {
         key: "income",
         name: "Income",
         amount: income,
-        color: "lightgreen",
+        color: "#C8F7C5",
         icon: "wallet",
       },
       {
         key: "expense",
         name: "Expense",
         amount: expense,
-        color: "salmon",
+        color: "#FADBD8",
         icon: "bag-remove",
       },
     ];
   }
 
-  const filtered = transactions.filter(
+  const filtered = currentMonthTsx.filter(
     (t) => t.type.toLowerCase() === tab.toLowerCase()
   );
 

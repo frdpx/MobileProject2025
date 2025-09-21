@@ -13,9 +13,12 @@ import { mockUser } from "../mock/mockUser";
 import { balanceData } from "../mock/balanceData"; // import balanceData
 import { useNavigation } from "@react-navigation/native";
 import Header from "../components/common/Header";
+import { calcBalance } from "../utils/calcTotal";
+import { transactions } from "../mock/transactionHistory";
 
 export const ProfileScreen = () => {
   const navigation = useNavigation();
+  const totalBalance = calcBalance(transactions);
 
   const [firstName, setFirstName] = useState(mockUser.firstName);
   const [lastName, setLastName] = useState(mockUser.lastName);
@@ -30,7 +33,7 @@ export const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header balance={balanceData.total} />
+      <Header balance={totalBalance} />
 
       <View style={styles.profileHeader}>
         <FontAwesome name="user-circle" size={64} color="black" />

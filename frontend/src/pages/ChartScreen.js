@@ -7,22 +7,43 @@ import PieChartCard from "../components/chart/PieChartCard";
 import MonthDropdown from "../components/chart/MonthDropdown";
 import SummaryCard from "../components/chart/SummaryCard";
 import CategoryList from "../components/chart/CategoryList";
+import { this_month, this_year } from "../utils/dateUtils";
+import { groupTransactionByCategory } from "../utils/groupTransaction";
+import { calcBalance } from "../utils/calcTotal";
 
 export const ChartScreen = () => {
   const [activeTab, setActiveTab] = useState("total");
-  const [month, setMonth] = useState("09");
+  const [month, setMonth] = useState(this_month);
+  const [year, setYear] = useState(this_year);
+
+  const totalBalance = calcBalance(transactions);
 
   return (
     <View style={styles.container}>
-      <Header balance={12255} />
+      <Header balance={totalBalance} />
       <ChartTabs activeTab={activeTab} onChangeTab={setActiveTab} />
       <View style={styles.dropdown}>
         <MonthDropdown value={month} onChange={setMonth} width={160} />
       </View>
       <View style={styles.chartWrapper}>
-        <PieChartCard transactions={transactions} tab={activeTab} />
-        <SummaryCard summary={{ Day: 220, Week: 1060, Month: 4520 }} />
-        <CategoryList transactions={transactions} tab={activeTab} />
+        <PieChartCard
+          transactions={transactions}
+          tab={activeTab}
+          month={month}
+          year={year}
+        />
+        <SummaryCard
+          transactions={transactions}
+          tab={activeTab}
+          month={month}
+          year={year}
+        />
+        <CategoryList
+          transactions={transactions}
+          tab={activeTab}
+          month={month}
+          year={year}
+        />
       </View>
     </View>
   );

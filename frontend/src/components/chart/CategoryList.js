@@ -1,9 +1,14 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { groupTransactionByCategory } from "../../utils/groupTransaction";
+import { isEmptyTransactions } from "../../utils/isEmpty";
 
-const CategoryList = ({ transactions, tab }) => {
-  const data = groupTransactionByCategory(transactions, tab);
+const CategoryList = ({ transactions, tab, month, year }) => {
+  const data = groupTransactionByCategory(transactions, tab, month, year);
+
+  if (isEmptyTransactions(data)) {
+    return <Text style={styles.noData}>No data</Text>;
+  }
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
@@ -67,5 +72,9 @@ const styles = StyleSheet.create({
   percent: {
     fontSize: 13,
     color: "#777",
+  },
+  noData: {
+    textAlign: "center",
+    marginVertical: 50,
   },
 });
