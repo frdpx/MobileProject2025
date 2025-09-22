@@ -1,39 +1,41 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { mockUser } from "../mock/mockUser";
-import { balanceData } from "../mock/balanceData"; // import balanceData
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, Modal } from 'react-native';
 import Header from "../components/common/Header";
-import { calcBalance } from "../utils/calcTotal";
-import { transactions } from "../mock/transactionHistory";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { mockUser } from "../mock/mockUser"; 
+import { balanceData } from "../mock/balanceData";
 
 export const ProfileScreen = () => {
-  const navigation = useNavigation();
-  const totalBalance = calcBalance(transactions);
-
   const [firstName, setFirstName] = useState(mockUser.firstName);
   const [lastName, setLastName] = useState(mockUser.lastName);
   const [email, setEmail] = useState(mockUser.email || "");
 
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingField, setEditingField] = useState('');
+  const [tempValue, setTempValue] = useState('');
+
+  const openEditModal = (field, value) => {
+    setEditingField(field);
+    setTempValue(value);
+    setModalVisible(true);
+  };
+
+  const saveEdit = () => {
+    if (editingField === 'firstName') setFirstName(tempValue);
+    if (editingField === 'lastName') setLastName(tempValue);
+    if (editingField === 'email') setEmail(tempValue);
+    setModalVisible(false);
+  };
+
+  // Dummy logout function
   const handleSignOut = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "WelcomeScreen" }],
-    });
+    console.log("Sign out pressed"); // แค่ log เพื่อแสดงว่ากดปุ่มแล้ว
   };
 
   return (
     <View style={styles.container}>
-      <Header balance={totalBalance} />
+      <Header balance={balanceData.total} />
 
       <View style={styles.profileHeader}>
         <FontAwesome name="user-circle" size={64} color="black" />
@@ -41,69 +43,127 @@ export const ProfileScreen = () => {
       </View>
 
       <View style={styles.inputGroup}>
-        <Text>Username</Text>
+        <Text style={styles.label}>Username</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, styles.disabledInput]}
           value={mockUser.username}
           editable={false}
         />
 
-        <Text>First Name</Text>
+        <Text style={styles.label}>First Name</Text>
+        <Pressable onPress={() => openEditModal('firstName', firstName)}>
+          <Text style={styles.input}>{firstName}</Text>
+        </Pressable>
+
+        <Text style={styles.label}>Last Name</Text>
+        <Pressable onPress={() => openEditModal('lastName', lastName)}>
+          <Text style={styles.input}>{lastName}</Text>
+        </Pressable>
+
+        <Text style={styles.label}>Email</Text>
         <TextInput
-          style={styles.input}
-          value={firstName}
-          onChangeText={setFirstName}
+          style={[styles.input, styles.disabledInput]}
+          value={mockUser.email}
+          editable={false}
         />
 
-        <Text>Last Name</Text>
+        <Text style={styles.label}>Date of Birth</Text>
         <TextInput
-          style={styles.input}
-          value={lastName}
-          onChangeText={setLastName}
-        />
-
-        <Text>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-
-        <Text>Date of Birth</Text>
-        <TextInput
-          style={styles.input}
+          style={[styles.input, styles.disabledInput]}
           value={mockUser.dateOfBirth}
           editable={false}
         />
       </View>
 
-      <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut}>
-        <MaterialIcons name="logout" size={24} color="black" />
-        <Text style={{ marginLeft: 10 }}>Sign out</Text>
-      </TouchableOpacity>
+      <Pressable style={styles.signOutBtn} onPress={handleSignOut}>
+        <Text style={styles.signOutText}>Sign out</Text>
+      </Pressable>
+
+      {/* Modal Popup */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Edit {editingField}</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={tempValue}
+              onChangeText={setTempValue}
+            />
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.modalBtn} onPress={() => setModalVisible(false)}>
+                <Text>Cancel</Text>
+              </Pressable>
+              <Pressable style={[styles.modalBtn, styles.modalSaveBtn]} onPress={saveEdit}>
+                <Text style={{ color: '#fff' }}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  profileHeader: { alignItems: "center", marginVertical: 20 },
-  fullName: { fontSize: 20, fontWeight: "bold", marginTop: 10 },
+  container: { flex: 1, backgroundColor: '#fff' },
+  profileHeader: { alignItems: 'center', marginVertical: 20 },
+  fullName: { fontSize: 20, fontWeight: 'bold', marginTop: 10 },
   inputGroup: { marginVertical: 20, paddingHorizontal: 20 },
+  label: { marginBottom: 5, fontWeight: '600' },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 8,
     marginBottom: 15,
+    fontSize: 16,
+  },
+  disabledInput: {
+    color: '#555',
+    backgroundColor: '#f2f2f2',
   },
   signOutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 15,
-    backgroundColor: "#eee",
-    borderRadius: 10,
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginVertical: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
+  signOutText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  modalButtons: { flexDirection: 'row', justifyContent: 'flex-end' },
+  modalBtn: { marginLeft: 15, paddingVertical: 8, paddingHorizontal: 15 },
+  modalSaveBtn: { backgroundColor: '#000', borderRadius: 10 },
 });

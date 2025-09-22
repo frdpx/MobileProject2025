@@ -1,4 +1,3 @@
-// components/common/AuthBackground.js
 import { View, StyleSheet } from "react-native";
 
 const AuthBackground = ({ header, children }) => {

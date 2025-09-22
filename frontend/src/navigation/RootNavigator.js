@@ -6,7 +6,7 @@ import { AddTransactionsScreen } from "../pages/AddTransactionsScreen";
 
 const Stack = createNativeStackNavigator();
 
-const isLoggedIn = true;
+const isLoggedIn = false;
 export const RootNavigator = () => {
   return (
     <NavigationContainer>
