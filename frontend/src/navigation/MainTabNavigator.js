@@ -5,7 +5,7 @@ import { ProfileScreen } from "../pages/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 
-export const MainTabNavigator = () => {
+export const MainTabNavigator = ({ setIsLoggedIn }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -28,7 +28,9 @@ export const MainTabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Chart" component={ChartScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile">
+        {(props) => <ProfileScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };

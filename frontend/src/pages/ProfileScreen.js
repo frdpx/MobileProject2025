@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, Modal } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Modal,
+} from "react-native";
 import Header from "../components/common/Header";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { mockUser } from "../mock/mockUser"; 
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { mockUser } from "../mock/mockUser";
 import { balanceData } from "../mock/balanceData";
 
-export const ProfileScreen = () => {
+export const ProfileScreen = ({ setIsLoggedIn }) => {
   const [firstName, setFirstName] = useState(mockUser.firstName);
   const [lastName, setLastName] = useState(mockUser.lastName);
   const [email, setEmail] = useState(mockUser.email || "");
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingField, setEditingField] = useState('');
-  const [tempValue, setTempValue] = useState('');
+  const [editingField, setEditingField] = useState("");
+  const [tempValue, setTempValue] = useState("");
 
   const openEditModal = (field, value) => {
     setEditingField(field);
@@ -22,15 +29,14 @@ export const ProfileScreen = () => {
   };
 
   const saveEdit = () => {
-    if (editingField === 'firstName') setFirstName(tempValue);
-    if (editingField === 'lastName') setLastName(tempValue);
-    if (editingField === 'email') setEmail(tempValue);
+    if (editingField === "firstName") setFirstName(tempValue);
+    if (editingField === "lastName") setLastName(tempValue);
+    if (editingField === "email") setEmail(tempValue);
     setModalVisible(false);
   };
 
-  // Dummy logout function
   const handleSignOut = () => {
-    console.log("Sign out pressed"); // แค่ log เพื่อแสดงว่ากดปุ่มแล้ว
+    setIsLoggedIn(false);
   };
 
   return (
@@ -51,12 +57,12 @@ export const ProfileScreen = () => {
         />
 
         <Text style={styles.label}>First Name</Text>
-        <Pressable onPress={() => openEditModal('firstName', firstName)}>
+        <Pressable onPress={() => openEditModal("firstName", firstName)}>
           <Text style={styles.input}>{firstName}</Text>
         </Pressable>
 
         <Text style={styles.label}>Last Name</Text>
-        <Pressable onPress={() => openEditModal('lastName', lastName)}>
+        <Pressable onPress={() => openEditModal("lastName", lastName)}>
           <Text style={styles.input}>{lastName}</Text>
         </Pressable>
 
@@ -95,11 +101,17 @@ export const ProfileScreen = () => {
               onChangeText={setTempValue}
             />
             <View style={styles.modalButtons}>
-              <Pressable style={styles.modalBtn} onPress={() => setModalVisible(false)}>
+              <Pressable
+                style={styles.modalBtn}
+                onPress={() => setModalVisible(false)}
+              >
                 <Text>Cancel</Text>
               </Pressable>
-              <Pressable style={[styles.modalBtn, styles.modalSaveBtn]} onPress={saveEdit}>
-                <Text style={{ color: '#fff' }}>Save</Text>
+              <Pressable
+                style={[styles.modalBtn, styles.modalSaveBtn]}
+                onPress={saveEdit}
+              >
+                <Text style={{ color: "#fff" }}>Save</Text>
               </Pressable>
             </View>
           </View>
@@ -110,29 +122,29 @@ export const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  profileHeader: { alignItems: 'center', marginVertical: 20 },
-  fullName: { fontSize: 20, fontWeight: 'bold', marginTop: 10 },
+  container: { flex: 1, backgroundColor: "#fff" },
+  profileHeader: { alignItems: "center", marginVertical: 20 },
+  fullName: { fontSize: 20, fontWeight: "bold", marginTop: 10 },
   inputGroup: { marginVertical: 20, paddingHorizontal: 20 },
-  label: { marginBottom: 5, fontWeight: '600' },
+  label: { marginBottom: 5, fontWeight: "600" },
   input: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
     paddingVertical: 8,
     marginBottom: 15,
     fontSize: 16,
   },
   disabledInput: {
-    color: '#555',
-    backgroundColor: '#f2f2f2',
+    color: "#555",
+    backgroundColor: "#f2f2f2",
   },
   signOutBtn: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 20,
     marginVertical: 30,
     shadowColor: "#000",
@@ -141,29 +153,29 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  signOutText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  signOutText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   modalBackground: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    width: '85%',
-    backgroundColor: '#fff',
+    width: "85%",
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
   },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
   modalInput: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
     fontSize: 16,
   },
-  modalButtons: { flexDirection: 'row', justifyContent: 'flex-end' },
+  modalButtons: { flexDirection: "row", justifyContent: "flex-end" },
   modalBtn: { marginLeft: 15, paddingVertical: 8, paddingHorizontal: 15 },
-  modalSaveBtn: { backgroundColor: '#000', borderRadius: 10 },
+  modalSaveBtn: { backgroundColor: "#000", borderRadius: 10 },
 });
