@@ -26,7 +26,10 @@ export const RootNavigator = () => {
             />
           </>
         ) : (
-          <Stack.Screen name="Auth" component={AuthNavigator} />
+          // ส่ง setIsLoggedIn ลงไปให้ AuthNavigator
+          <Stack.Screen name="Auth">
+            {(props) => <AuthNavigator {...props} setIsLoggedIn={setIsLoggedIn} />}
+          </Stack.Screen>
         )}
       </Stack.Navigator>
     </NavigationContainer>
