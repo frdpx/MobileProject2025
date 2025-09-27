@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View, Alert } from "react-native";
 import { Text } from "react-native-paper";
 import AuthBackground from "../components/common/AuthBackground";
 import Button from "../components/common/Button";
 import { useNavigation } from "@react-navigation/native";
 import FormInput from "../components/common/FormInput";
 import PasswordInput from "../components/common/PasswordInput";
-import { DatePickerInput } from "react-native-paper-dates";
+import Calendar from "../components/calendar/calendar";
 
 export const SignUpSreen = () => {
   const navigation = useNavigation();
@@ -19,38 +19,35 @@ export const SignUpSreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  
+  const handleSignUp = () => {
+    // ตรวจสอบว่ากรอกครบทุกช่อง
+    if (!firstname || !lastname || !email || !mobile || !dob || !password || !confirmPassword) {
+      Alert.alert("❌ Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      return;
+    }
 
-const handleSignUp = () => {
-  // เช็คว่ามีช่องว่างที่ยังไม่ได้กรอก
-  if (!firstname || !lastname || !email || !mobile || !dob || !password || !confirmPassword) {
-    alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
-    return;
-  }
+    // ตรวจสอบรหัสผ่านตรงกัน
+    if (password !== confirmPassword) {
+      Alert.alert("❌ Error", "Passwords do not match!");
+      return;
+    }
 
-  // เช็ครหัสผ่านตรงกันไหม
-  if (password !== confirmPassword) {
-    alert("Passwords do not match!");
-    return;
-  }
+    // Mock signup success
+    console.log("Signup success:", {
+      firstname,
+      lastname,
+      email,
+      mobile,
+      dob,
+      password,
+    });
 
-  // ถ้าผ่านทุก validation
-  console.log("Signup success:", {
-    firstname,
-    lastname,
-    email,
-    mobile,
-    dob,
-    password,
-  });
-
-  // TODO: ส่งข้อมูลไป backend หรือ firebase ได้
-};
-
+    // ไปหน้า Login หลัง signup สำเร็จ
+    navigation.navigate("Login"); // ตรวจสอบชื่อ screen ให้ตรงกับ AuthNavigator
+  };
 
   return (
     <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
-      {/* First Name */}
       <FormInput
         label={"First Name"}
         placholder={"John"}
@@ -58,7 +55,6 @@ const handleSignUp = () => {
         onChangeText={setFirstname}
       />
 
-      {/* Last Name */}
       <FormInput
         label={"Last Name"}
         placholder={"Doe"}
@@ -66,7 +62,6 @@ const handleSignUp = () => {
         onChangeText={setLastname}
       />
 
-      {/* Email */}
       <FormInput
         label={"Email"}
         placholder={"example@example.com"}
@@ -74,7 +69,6 @@ const handleSignUp = () => {
         onChangeText={setEmail}
       />
 
-      {/* Mobile */}
       <FormInput
         label={"Mobile Number"}
         placholder={"0812345678"}
@@ -83,27 +77,17 @@ const handleSignUp = () => {
         keyboardType="phone-pad"
       />
 
-      {/* Date of Birth */}
-      <DatePickerInput
-        locale="en"
-        label="Date of Birth"
-        value={dob}
-        onChange={(d) => setDob(d)}
-        inputMode="start"
-        style={{ marginTop: 10 }}
-      />
+      {/* Calendar component */}
+      <Calendar label="Date of Birth" value={dob} onChange={setDob} />
 
-      {/* Password */}
       <PasswordInput value={password} onChangeText={setPassword} />
 
-      {/* Confirm Password */}
       <PasswordInput
         label="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
 
-      {/* Signup Button */}
       <Button
         title="Sign Up"
         onPress={handleSignUp}
@@ -112,19 +96,10 @@ const handleSignUp = () => {
         textColor={"#fff"}
       />
 
-      {/* Extra Links */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 10,
-        }}
-      >
+      <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 10 }}>
         <Text style={styles.footer}>Already have an account? </Text>
-        <Pressable onPress={() => navigation.navigate("LoginScreen")}>
-          <Text
-            style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}
-          >
+        <Pressable onPress={() => navigation.navigate("Login")}>
+          <Text style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}>
             Log In
           </Text>
         </Pressable>
@@ -145,4 +120,3 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 });
-
