@@ -1,13 +1,19 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTransactionStore } from "../../store/useTransactions";
+import { calcBalance } from "../../utils/calcTotal";
 
-const TotalCard = ({ balance }) => {
+const TotalCard = () => {
+  const transactions = useTransactionStore((state) => state.transactions);
+  const balance = calcBalance(transactions);
   return (
     <View style={styles.wrapper}>
       <View style={styles.card}>
         <Text style={styles.title}>Total Balance</Text>
 
-        <Text style={styles.amount}>฿{balance.total.toLocaleString()}</Text>
+        <Text style={styles.amount}>
+          ฿{(balance.total ?? 0).toLocaleString()}
+        </Text>
 
         <View style={styles.row}>
           <View style={styles.col}>
@@ -17,7 +23,9 @@ const TotalCard = ({ balance }) => {
                 Income
               </Text>
             </View>
-            <Text style={styles.value}>฿{balance.income.toLocaleString()}</Text>
+            <Text style={styles.value}>
+              ฿{(balance.income ?? 0).toLocaleString()}
+            </Text>
           </View>
 
           <View style={[styles.col, { alignItems: "flex-end" }]}>
@@ -26,7 +34,7 @@ const TotalCard = ({ balance }) => {
               <Text style={[styles.label, { color: "salmon" }]}>Expenses</Text>
             </View>
             <Text style={styles.value}>
-              ฿{balance.expenses.toLocaleString()}
+              ฿{(balance.expense ?? 0).toLocaleString()}
             </Text>
           </View>
         </View>

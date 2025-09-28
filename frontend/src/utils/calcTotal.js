@@ -33,5 +33,9 @@ export const calcBalance = (transactions) => {
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 
-  return income - expense;
+  return {
+    total: income - expense,
+    income,
+    expense,
+  };
 };

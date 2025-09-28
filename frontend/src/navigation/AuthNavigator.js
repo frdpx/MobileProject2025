@@ -5,16 +5,16 @@ import { WelcomeScreen } from "../pages/WelcomeScreen";
 import { ForgotPasswordScreen } from "../pages/ForgotPasswordScreen";
 
 const Stack = createNativeStackNavigator();
-export const AuthNavigator = ({ setIsLoggedIn }) => {
+export const AuthNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="Welcome"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="Login">
-        {(props) => <LogInScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
-      </Stack.Screen>
+      <Stack.Screen name="Login" component={LogInScreen} />
+      {/* {(props) => <LogInScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+      </Stack.Screen> */}
       <Stack.Screen name="Signup" component={SignUpSreen} />
       <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
     </Stack.Navigator>

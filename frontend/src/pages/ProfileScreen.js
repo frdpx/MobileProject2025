@@ -11,11 +11,18 @@ import Header from "../components/common/Header";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { mockUser } from "../mock/mockUser";
 import { balanceData } from "../mock/balanceData";
+import { useAuthStore } from "../store/useAuthStore";
 
-export const ProfileScreen = ({ setIsLoggedIn }) => {
-  const [firstName, setFirstName] = useState(mockUser.firstName);
-  const [lastName, setLastName] = useState(mockUser.lastName);
-  const [email, setEmail] = useState(mockUser.email || "");
+export const ProfileScreen = () => {
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const updateUser = useAuthStore((state) => state.updateUser);
+
+  // const [firstName, setFirstName] = useState(user?.firstName || "");
+  // const [lastName, setLastName] = useState(user?.lastName || "");
+  // const [userName, setUserName] = useState(user?.userName || "");
+  // const [email, setEmail] = useState(user?.email || "");
+  // const [dateOfBirth, setDateofBirth] = useState(user?.dateOfBirth || "");
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
@@ -29,14 +36,16 @@ export const ProfileScreen = ({ setIsLoggedIn }) => {
   };
 
   const saveEdit = () => {
-    if (editingField === "firstName") setFirstName(tempValue);
-    if (editingField === "lastName") setLastName(tempValue);
-    if (editingField === "email") setEmail(tempValue);
+    // if (editingField === "firstName") setFirstName(tempValue);
+    // if (editingField === "lastName") setLastName(tempValue);
+    // if (editingField === "email") setEmail(tempValue);
+    updateUser({ [editingField]: tempValue });
     setModalVisible(false);
   };
 
   const handleSignOut = () => {
-    setIsLoggedIn(false);
+    // setIsLoggedIn(false);
+    logout();
   };
 
   return (
@@ -45,38 +54,40 @@ export const ProfileScreen = ({ setIsLoggedIn }) => {
 
       <View style={styles.profileHeader}>
         <FontAwesome name="user-circle" size={64} color="black" />
-        <Text style={styles.fullName}>{mockUser.fullName}</Text>
+        <Text style={styles.fullName}>
+          {user?.firstName} {user?.lastName}
+        </Text>
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Username</Text>
         <TextInput
           style={[styles.input, styles.disabledInput]}
-          value={mockUser.username}
+          value={user?.userName}
           editable={false}
         />
 
         <Text style={styles.label}>First Name</Text>
-        <Pressable onPress={() => openEditModal("firstName", firstName)}>
-          <Text style={styles.input}>{firstName}</Text>
+        <Pressable onPress={() => openEditModal("firstName", user?.firstName)}>
+          <Text style={styles.input}>{user?.firstName}</Text>
         </Pressable>
 
         <Text style={styles.label}>Last Name</Text>
-        <Pressable onPress={() => openEditModal("lastName", lastName)}>
-          <Text style={styles.input}>{lastName}</Text>
+        <Pressable onPress={() => openEditModal("lastName", user?.lastName)}>
+          <Text style={styles.input}>{user?.lastName}</Text>
         </Pressable>
 
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={[styles.input, styles.disabledInput]}
-          value={mockUser.email}
+          value={user?.email}
           editable={false}
         />
 
         <Text style={styles.label}>Date of Birth</Text>
         <TextInput
           style={[styles.input, styles.disabledInput]}
-          value={mockUser.dateOfBirth}
+          value={user?.dateOfBirth}
           editable={false}
         />
       </View>
