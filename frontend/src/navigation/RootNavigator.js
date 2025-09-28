@@ -4,11 +4,12 @@ import { AuthNavigator } from "./AuthNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AddTransactionsScreen } from "../pages/AddTransactionsScreen";
 import { useState } from "react";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   return (
     <NavigationContainer>
@@ -16,9 +17,7 @@ export const RootNavigator = () => {
         {isLoggedIn ? (
           <>
             <Stack.Screen name="MainTab">
-              {(props) => (
-                <MainTabNavigator {...props} setIsLoggedIn={setIsLoggedIn} />
-              )}
+              {(props) => <MainTabNavigator {...props} />}
             </Stack.Screen>
             <Stack.Screen
               name="AddTransactions"
@@ -26,9 +25,8 @@ export const RootNavigator = () => {
             />
           </>
         ) : (
-          // ส่ง setIsLoggedIn ลงไปให้ AuthNavigator
           <Stack.Screen name="Auth">
-            {(props) => <AuthNavigator {...props} setIsLoggedIn={setIsLoggedIn} />}
+            {(props) => <AuthNavigator {...props} />}
           </Stack.Screen>
         )}
       </Stack.Navigator>

@@ -13,9 +13,11 @@ import { useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { categoryIcons, defaultIcon } from "../../constants/icons";
 import { normalizeKey } from "../../utils/string";
+import { useTransactionStore } from "../../store/useTransactions";
 
-const TransactionHistory = ({ data, onEdit, onDelete }) => {
-  const latest = [...data]
+const TransactionHistory = ({ onEdit, onDelete }) => {
+  const transactions = useTransactionStore((state) => state.transactions);
+  const latest = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 10);
 
@@ -82,7 +84,7 @@ const TransactionHistory = ({ data, onEdit, onDelete }) => {
             <Text style={styles.date}>{formatDate(item.date)}</Text>
           </View>
 
-          <Text style={styles.amount}>฿{item.amount.toLocaleString()}</Text>
+          <Text style={styles.amount}>฿{item.amount ?? 0}</Text>
 
           <TouchableOpacity onPress={() => handleMenuPress(index, item)}>
             <Ionicons name="ellipsis-vertical" size={20} color="gray" />

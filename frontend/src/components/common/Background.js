@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-const Background = ({ firstname, lastname }) => {
+const Background = ({ firstName, lastName }) => {
   return (
     <View style={styles.container}>
       <View style={styles.backgroundCircle} />
@@ -10,7 +10,7 @@ const Background = ({ firstname, lastname }) => {
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Hi, Welcome Back</Text>
         <Text style={styles.username}>
-          {firstname} {lastname}
+          {firstName} {lastName}
         </Text>
       </View>
     </View>

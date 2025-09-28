@@ -1,10 +1,16 @@
 import { View, Text, StyleSheet } from "react-native";
+import { useTransactionStore } from "../../store/useTransactions";
+import { calcBalance } from "../../utils/calcTotal";
 
-const Header = ({ balance }) => {
+const Header = () => {
+  const transactions = useTransactionStore((state) => state.transactions);
+  const balance = calcBalance(transactions);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Total Balance</Text>
-      <Text style={styles.amount}>฿{balance.toLocaleString()}</Text>
+      <Text style={styles.amount}>
+        ฿{(balance.total ?? 0).toLocaleString()}
+      </Text>
     </View>
   );
 };
