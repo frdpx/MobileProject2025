@@ -10,12 +10,14 @@ import CategoryList from "../components/chart/CategoryList";
 import { this_month, this_year } from "../utils/dateUtils";
 import { groupTransactionByCategory } from "../utils/groupTransaction";
 import { calcBalance } from "../utils/calcTotal";
+import { useTransactionStore } from "../store/useTransactions";
 
 export const ChartScreen = () => {
   const [activeTab, setActiveTab] = useState("total");
   const [month, setMonth] = useState(this_month);
   const [year, setYear] = useState(this_year);
 
+  const transactions = useTransactionStore((state) => state.transactions);
   const totalBalance = calcBalance(transactions);
 
   return (
