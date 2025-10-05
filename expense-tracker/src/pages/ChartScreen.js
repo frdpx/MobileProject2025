@@ -1,6 +1,5 @@
 import { View, StyleSheet } from "react-native";
 import { useState } from "react";
-import { transactions } from "../mock/transactionHistory";
 import Header from "../components/common/Header";
 import ChartTabs from "../components/chart/ChartTabs";
 import PieChartCard from "../components/chart/PieChartCard";
@@ -8,7 +7,6 @@ import MonthDropdown from "../components/chart/MonthDropdown";
 import SummaryCard from "../components/chart/SummaryCard";
 import CategoryList from "../components/chart/CategoryList";
 import { this_month, this_year } from "../utils/dateUtils";
-import { groupTransactionByCategory } from "../utils/groupTransaction";
 import { calcBalance } from "../utils/calcTotal";
 import { useTransactionStore } from "../store/useTransactions";
 
@@ -63,7 +61,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     alignItems: "flex-end",
-    marginRight: 20,
+    marginRight: 24,
     marginTop: 5,
   },
 });

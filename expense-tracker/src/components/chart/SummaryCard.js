@@ -34,7 +34,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 5,
     paddingVertical: 10,
   },
   card: {

@@ -19,11 +19,10 @@ const PieChartCard = ({ transactions, tab, month, year }) => {
     <View style={styles.container}>
       <PieChart
         data={pieData}
-        width={screenWidth - 10}
+        width={screenWidth - 40}
         height={180}
         accessor="amount"
         backgroundColor="transparent"
-        paddingLeft="15"
         chartConfig={{
           color: (opacity = 1) => `rgba(0,0,0,${opacity})`,
         }}
