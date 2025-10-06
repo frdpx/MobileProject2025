@@ -32,3 +32,15 @@ export const filterTransactionsByMonth = (
     return d.getUTCMonth() === month && d.getUTCFullYear() === year;
   });
 };
+
+//แปลง ISO เป็นวันที่แบบไม่เปลี่ยนตาม time zone (ค.ศ.)
+export const revertFormatDate = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const year = date.getUTCFullYear();
+
+  return `${day}/${month}/${year}`;
+};

@@ -1,7 +1,6 @@
-// HomeScreen.js
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import TransactionHistory from "../components/transactions/TransactionHistory";
 import Background from "../components/common/Background";
@@ -9,14 +8,21 @@ import TotalCard from "../components/transactions/TotalCard";
 import { Ionicons } from "@expo/vector-icons";
 import { useTransactionStore } from "../store/useTransactions";
 import { useAuthStore } from "../store/useAuthStore";
-import { calcBalance } from "../utils/calcTotal"; // ✅ import utility
 
 export const HomeScreen = () => {
   const navigation = useNavigation();
   const [pressed, setPressed] = useState(false);
-  const { transactions, deleteTransaction } = useTransactionStore();
 
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuthStore();
+  const { transactions, listenTransactions, deleteTransaction } =
+    useTransactionStore();
+
+  useEffect(() => {
+    if (user?.uid) {
+      const unsub = listenTransactions(user.uid);
+      return () => unsub && unsub(); // cleanup listener ตอนออกจากหน้า
+    }
+  }, [user]);
 
   const handleAddButtonPressed = () => {
     navigation.navigate("AddTransactions", { mode: "add" });
@@ -66,7 +72,16 @@ export const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  history: { flex: 1, paddingHorizontal: 20 },
-  addButton: { alignItems: "center", marginVertical: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  history: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  addButton: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
 });

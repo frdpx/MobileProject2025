@@ -1,23 +1,80 @@
+// import { create } from "zustand";
+
+// export const useAuthStore = create((set) => ({
+//   user: null,
+//   isLoggedIn: false,
+
+//   login: (userData) =>
+//     set({
+//       user: userData,
+//       isLoggedIn: true,
+//     }),
+
+//   logout: () =>
+//     set({
+//       user: null,
+//       isLoggedIn: false,
+//     }),
+
+//   updateUser: (updates) =>
+//     set((state) => ({
+//       user: { ...state.user, ...updates },
+//     })),
+// }));
+
 import { create } from "zustand";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+  updateUserProfile,
+} from "../firebase/authService";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: null,
-  isLoggedIn: false,
+  loading: false,
+  error: null,
 
-  login: (userData) =>
-    set({
-      user: userData,
-      isLoggedIn: true,
-    }),
+  register: async (data) => {
+    set({ loading: true });
+    try {
+      const user = await registerUser(data);
+      set({ user, loading: false });
+    } catch (err) {
+      set({ error: err.message, loading: false });
+    }
+  },
 
-  logout: () =>
-    set({
-      user: null,
-      isLoggedIn: false,
-    }),
+  login: async (email, password) => {
+    set({ loading: true, error: null });
+    try {
+      const userData = await loginUser(email, password);
+      set({ user: userData, isLoggedIn: true, loading: false });
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      throw err;
+    }
+  },
 
-  updateUser: (updates) =>
-    set((state) => ({
-      user: { ...state.user, ...updates },
-    })),
+  logout: async () => {
+    await logoutUser();
+    set({ user: null, isLoggedIn: false });
+  },
+
+  updateUser: async (updates) => {
+    const { user } = get();
+    if (!user?.uid) {
+      console.warn("⚠️ No user logged in");
+      return;
+    }
+
+    try {
+      await updateUserProfile(user.uid, updates);
+      set({ user: { ...user, ...updates } });
+      console.log("User updated successfully in Firestore + Zustand");
+    } catch (err) {
+      console.error(" Failed to update user:", err);
+      throw err;
+    }
+  },
 }));

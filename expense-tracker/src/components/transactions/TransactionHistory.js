@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { categoryIcons, defaultIcon } from "../../constants/icons";
-import { normalizeKey } from "../../utils/string";
+import { displayCategoryName, normalizeKey } from "../../utils/string";
 import { useTransactionStore } from "../../store/useTransactions";
 
 const TransactionHistory = ({ onEdit, onDelete }) => {
@@ -80,7 +80,9 @@ const TransactionHistory = ({ onEdit, onDelete }) => {
           </View>
 
           <View style={styles.info}>
-            <Text style={styles.title}>{item.category}</Text>
+            <Text style={styles.title}>
+              {displayCategoryName(item.category)}{" "}
+            </Text>
             <Text style={styles.date}>{formatDate(item.date)}</Text>
           </View>
 

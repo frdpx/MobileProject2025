@@ -1,36 +1,56 @@
 import { create } from "zustand";
-import { transactions } from "../mock/transactionHistory";
+import {
+  addTransactionToDB,
+  updateTransactionInDB,
+  deleteTransactionFromDB,
+  listenToUserTransactions,
+} from "../firebase/firestoreService";
 
-export const useTransactionStore = create((set) => ({
-  transactions: transactions,
+export const useTransactionStore = create((set, get) => ({
+  transactions: [],
+  loading: false,
+  error: null,
+  unsubscribe: null,
 
-  // โหลด mock data หรือดึงจาก DB
-  setTransactions: (transactions) => set({ transactions }),
+  //realtime
+  listenTransactions: (userId) => {
+    const { unsubscribe } = get();
+    if (unsubscribe) unsubscribe(); //close old listener
 
-  // เพิ่ม
-  addTransaction: (transaction) =>
-    set((state) => ({
-      transactions: [
-        ...state.transactions,
-        {
-          id: Date.now(),
-          ...transaction,
-          amount: Number(transaction.amount) || 0,
-        },
-      ],
-    })),
+    set({ loading: true });
+    const unsub = listenToUserTransactions(userId, (data) => {
+      set({ transactions: data, loading: false });
+    });
 
-  // แก้ไข
-  updateTransaction: (id, updated) =>
-    set((state) => ({
-      transactions: state.transactions.map((t) =>
-        t.id === id ? { ...t, ...updated } : t
-      ),
-    })),
+    set({ unsubscribe: unsub });
+  },
 
-  // ลบ
-  deleteTransaction: (id) =>
-    set((state) => ({
-      transactions: state.transactions.filter((t) => t.id !== id),
-    })),
+  addTransaction: async (userId, transaction) => {
+    try {
+      const id = await addTransactionToDB(userId, transaction);
+      console.log("Added transaction with Firestore ID:", id);
+      return id;
+    } catch (err) {
+      console.error("Add Error:", err);
+      set({ error: err.message });
+    }
+  },
+
+  updateTransaction: async (id, updatedData) => {
+    try {
+      await updateTransactionInDB(id, updatedData);
+    } catch (err) {
+      console.error("Update Error:", err);
+      set({ error: err.message });
+    }
+  },
+
+  deleteTransaction: async (id) => {
+    try {
+      await deleteTransactionFromDB(id);
+    } catch (err) {
+      console.error("Delete Error:", err);
+      set({ error: err.message });
+    }
+  },
 }));

@@ -14,19 +14,17 @@ export const LogInScreen = () => {
   const [password, setPassword] = useState("");
   const login = useAuthStore((state) => state.login);
 
-  const handleLoginButtonPressed = () => {
-    // if (email === "bam@example.com" && password === "123456") {
-    login({
-      firstName: "Bam",
-      lastName: "PAK",
-      email: "bam@example.com",
-      userName: "bambam123",
-      dateOfBirth: "25/08/2545",
-    });
-
-    // } else {
-    //   Alert.alert("Login Failed", "Invalid email or password");
-    // }
+  const handleLoginButtonPressed = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in both email and password");
+      return;
+    }
+    try {
+      await login(email.trim(), password.trim());
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Login Failed", error.message || "Invalid credentials");
+    }
   };
 
   return (
@@ -39,10 +37,8 @@ export const LogInScreen = () => {
         onChangeText={(text) => setEmail(text.trim())}
       />
 
-      {/* Password */}
       <PasswordInput value={password} onChangeText={setPassword} />
 
-      {/* Login Button */}
       <Button
         title="Log In"
         onPress={handleLoginButtonPressed}
@@ -51,7 +47,6 @@ export const LogInScreen = () => {
         textColor={"#fff"}
       />
 
-      {/* Extra Links */}
       <Pressable onPress={() => navigation.navigate("Forgot")}>
         <Text style={styles.link}>Forgot Password?</Text>
       </Pressable>
