@@ -8,12 +8,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDulWGV3hArlJVNnrMW9RJEwP1XJWe9I1A",
-  authDomain: "expense-tracker-2025-dc096.firebaseapp.com",
-  projectId: "expense-tracker-2025-dc096",
-  storageBucket: "expense-tracker-2025-dc096.appspot.com",
-  messagingSenderId: "971555531567",
-  appId: "1:971555531567:web:f87c227223fb7942f3cfda",
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 //ใช้ getApps เพื่อป้องกัน re-initialize
@@ -28,7 +28,7 @@ try {
   console.log("Firebase Auth initialized with persistence");
 } catch (e) {
   auth = getAuth(app); // fallback กรณีถูก init แล้ว
-  console.log("⚠️ Firebase Auth already initialized, using existing one");
+  console.log("Firebase Auth already initialized, using existing one");
 }
 
 export const db = getFirestore(app);

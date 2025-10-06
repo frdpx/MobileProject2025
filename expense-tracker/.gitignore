@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# Ignore environment files
+.env
+
 # Expo
 .expo/
 dist/
