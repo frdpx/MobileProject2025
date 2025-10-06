@@ -6,25 +6,19 @@ import {
   TextInput,
   Pressable,
   Modal,
+  Alert,
 } from "react-native";
 import Header from "../components/common/Header";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { mockUser } from "../mock/mockUser";
 import { balanceData } from "../mock/balanceData";
 import { useAuthStore } from "../store/useAuthStore";
+import { revertFormatDate } from "../utils/dateUtils";
 
 export const ProfileScreen = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const updateUser = useAuthStore((state) => state.updateUser);
 
-  // const [firstName, setFirstName] = useState(user?.firstName || "");
-  // const [lastName, setLastName] = useState(user?.lastName || "");
-  // const [userName, setUserName] = useState(user?.userName || "");
-  // const [email, setEmail] = useState(user?.email || "");
-  // const [dateOfBirth, setDateofBirth] = useState(user?.dateOfBirth || "");
-
-  // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [editingField, setEditingField] = useState("");
   const [tempValue, setTempValue] = useState("");
@@ -35,17 +29,19 @@ export const ProfileScreen = () => {
     setModalVisible(true);
   };
 
-  const saveEdit = () => {
-    // if (editingField === "firstName") setFirstName(tempValue);
-    // if (editingField === "lastName") setLastName(tempValue);
-    // if (editingField === "email") setEmail(tempValue);
-    updateUser({ [editingField]: tempValue });
-    setModalVisible(false);
-  };
-
-  const handleSignOut = () => {
-    // setIsLoggedIn(false);
-    logout();
+  const saveEdit = async () => {
+    if (!tempValue.trim()) {
+      Alert.alert("Error", "Value cannot be empty");
+      return;
+    }
+    try {
+      await updateUser({ [editingField]: tempValue });
+      Alert.alert("Success", "Profile updated successfully!");
+      setModalVisible(false);
+    } catch (err) {
+      Alert.alert("Error", "Failed to update profile");
+      console.error("Update error:", err);
+    }
   };
 
   return (
@@ -60,13 +56,6 @@ export const ProfileScreen = () => {
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={[styles.input, styles.disabledInput]}
-          value={user?.userName}
-          editable={false}
-        />
-
         <Text style={styles.label}>First Name</Text>
         <Pressable onPress={() => openEditModal("firstName", user?.firstName)}>
           <Text style={styles.input}>{user?.firstName}</Text>
@@ -83,26 +72,21 @@ export const ProfileScreen = () => {
           value={user?.email}
           editable={false}
         />
-
         <Text style={styles.label}>Date of Birth</Text>
+
         <TextInput
           style={[styles.input, styles.disabledInput]}
-          value={user?.dateOfBirth}
+          value={revertFormatDate(user?.dateOfBirth)}
           editable={false}
         />
       </View>
 
-      <Pressable style={styles.signOutBtn} onPress={handleSignOut}>
+      <Pressable style={styles.signOutBtn} onPress={logout}>
         <Text style={styles.signOutText}>Sign out</Text>
       </Pressable>
 
-      {/* Modal Popup */}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
+      {/* Modal */}
+      <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Edit {editingField}</Text>
@@ -112,10 +96,7 @@ export const ProfileScreen = () => {
               onChangeText={setTempValue}
             />
             <View style={styles.modalButtons}>
-              <Pressable
-                style={styles.modalBtn}
-                onPress={() => setModalVisible(false)}
-              >
+              <Pressable onPress={() => setModalVisible(false)}>
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable

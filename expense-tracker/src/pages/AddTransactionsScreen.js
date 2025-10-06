@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  Alert,
+} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import Calendar from "../components/calendar/calendar";
 import { useTransactionStore } from "../store/useTransactions";
+import { useAuthStore } from "../store/useAuthStore";
 
 const incomeMenu = [
   { label: "Salary", value: "salary" },
@@ -60,9 +68,11 @@ export const AddTransactionsScreen = () => {
   const navigation = useNavigation();
 
   const transaction = route.params?.transaction ?? null;
+  const mode = route.params?.mode ?? "add";
 
   const { addTransaction, updateTransaction, deleteTransaction } =
     useTransactionStore();
+  const user = useAuthStore((state) => state.user); // ดึง uid
 
   const [type, setType] = useState(transaction?.type || "income");
   const [categoryOptions, setCategoryOptions] = useState(
@@ -79,6 +89,7 @@ export const AddTransactionsScreen = () => {
   );
   const [comment, setComment] = useState(transaction?.comment || "");
 
+  // เปลี่ยน category ตาม type
   useEffect(() => {
     const options = type === "income" ? incomeMenu : expensesMenu;
     setCategoryOptions(options);
@@ -94,31 +105,43 @@ export const AddTransactionsScreen = () => {
 
   const handleResetAmount = () => setAmount("0");
 
-  const handleSave = () => {
+  // บันทึกข้อมูล (เพิ่ม/แก้ไข)
+  const handleSave = async () => {
+    if (!user?.uid) {
+      Alert.alert("Error", "You must be logged in to save transactions");
+      return;
+    }
+
     const value = parseFloat((parseInt(amount, 10) / 100).toFixed(2));
     const newTransaction = {
-      id: transaction?.id || Date.now().toString(),
       type,
       category,
-      date,
+      date: date.toISOString(),
       amount: value,
       comment,
     };
 
-    if (transaction) {
-      updateTransaction(transaction.id, newTransaction);
-    } else {
-      addTransaction(newTransaction);
-    }
+    try {
+      if (mode === "edit" && transaction) {
+        await updateTransaction(transaction.id, newTransaction);
+      } else {
+        const newId = await addTransaction(user.uid, newTransaction); //รับ id กลับ
+        console.log("Saved new transaction ID:", newId);
+      }
 
-    navigation.goBack();
+      navigation.navigate("MainTab", { screen: "Home" });
+    } catch (error) {
+      Alert.alert("Error", "Failed to save transaction");
+      console.error(error);
+    }
   };
 
-  const handleDelete = () => {
+  // ลบ
+  const handleDelete = async () => {
     if (transaction) {
-      deleteTransaction(transaction.id);
+      await deleteTransaction(transaction.id);
+      navigation.navigate("MainTab", { screen: "Home" });
     }
-    navigation.goBack();
   };
 
   const displayAmount = (parseInt(amount, 10) / 100).toFixed(2);
@@ -126,10 +149,9 @@ export const AddTransactionsScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>
-        {transaction ? "Edit Transaction" : "Add Transaction"}
+        {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
       </Text>
 
-      {/* Type + Category */}
       <View style={styles.dropdownRow}>
         <Dropdown
           items={[
@@ -148,15 +170,12 @@ export const AddTransactionsScreen = () => {
         />
       </View>
 
-      {/* Calendar */}
       <View style={styles.calendarWrapper}>
         <Calendar label="Date" value={date} onChange={setDate} />
       </View>
 
-      {/* Amount */}
       <Text style={styles.amountText}>฿ {displayAmount}</Text>
 
-      {/* Numpad */}
       <View style={styles.numpad}>
         {[
           ["1", "2", "3"],
@@ -190,7 +209,6 @@ export const AddTransactionsScreen = () => {
         ))}
       </View>
 
-      {/* Comment */}
       <TextInput
         style={styles.commentInput}
         placeholder="Add comment..."
@@ -199,8 +217,8 @@ export const AddTransactionsScreen = () => {
         multiline
       />
 
-      {/* Delete (Edit only) */}
-      {transaction && (
+      {/* Delete */}
+      {mode === "edit" && (
         <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
           <Text style={styles.deleteText}>Delete</Text>
         </Pressable>
@@ -209,7 +227,6 @@ export const AddTransactionsScreen = () => {
   );
 };
 
-// ----------------- STYLES -----------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import FormInput from "../components/common/FormInput";
 import PasswordInput from "../components/common/PasswordInput";
 import Calendar from "../components/calendar/calendar";
+import { useAuthStore } from "../store/useAuthStore";
 
 export const SignUpSreen = () => {
   const navigation = useNavigation();
@@ -19,59 +20,70 @@ export const SignUpSreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSignUp = () => {
-    // ตรวจสอบว่ากรอกครบทุกช่อง
-    if (!firstname || !lastname || !email || !mobile || !dob || !password || !confirmPassword) {
-      Alert.alert("❌ Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
+  const { register, loading } = useAuthStore();
+  const handleSignUp = async () => {
+    if (
+      !firstname ||
+      !lastname ||
+      !email ||
+      !mobile ||
+      !dob ||
+      !password ||
+      !confirmPassword
+    ) {
+      Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
 
-    // ตรวจสอบรหัสผ่านตรงกัน
     if (password !== confirmPassword) {
-      Alert.alert("❌ Error", "Passwords do not match!");
+      Alert.alert("Error", "Passwords do not match!");
       return;
     }
 
-    // Mock signup success
-    console.log("Signup success:", {
-      firstname,
-      lastname,
-      email,
-      mobile,
-      dob,
-      password,
-    });
+    try {
+      await register({
+        firstName: firstname,
+        lastName: lastname,
+        email,
+        mobile,
+        dateOfBirth: dob.toISOString(),
+        password,
+      });
 
-    // ไปหน้า Login หลัง signup สำเร็จ
-    navigation.navigate("Login"); // ตรวจสอบชื่อ screen ให้ตรงกับ AuthNavigator
+      Alert.alert("Success", "Account created successfully!");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Sign up failed:", error);
+      Alert.alert("Error", error.message || "Sign up failed");
+    }
   };
 
   return (
     <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
       <FormInput
         label={"First Name"}
-        placholder={"John"}
+        placholder={"Please input your first name"}
         value={firstname}
         onChangeText={setFirstname}
       />
 
       <FormInput
         label={"Last Name"}
-        placholder={"Doe"}
+        placholder={"Please input your last name"}
         value={lastname}
         onChangeText={setLastname}
       />
 
       <FormInput
         label={"Email"}
-        placholder={"example@example.com"}
+        placholder={"Please input your email"}
         value={email}
         onChangeText={setEmail}
       />
 
       <FormInput
         label={"Mobile Number"}
-        placholder={"0812345678"}
+        placholder={"Please input your mobile number"}
         value={mobile}
         onChangeText={setMobile}
         keyboardType="phone-pad"
@@ -96,10 +108,18 @@ export const SignUpSreen = () => {
         textColor={"#fff"}
       />
 
-      <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 10 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginTop: 10,
+        }}
+      >
         <Text style={styles.footer}>Already have an account? </Text>
         <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}>
+          <Text
+            style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}
+          >
             Log In
           </Text>
         </Pressable>
