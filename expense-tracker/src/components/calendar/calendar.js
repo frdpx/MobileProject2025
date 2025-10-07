@@ -10,6 +10,8 @@ const Calendar = ({ label = "Date", value, onChange }) => {
       onChange={onChange}
       inputMode="start"
       style={{ marginTop: 10 }}
+      editable={false}
+      showSoftInputOnFocus={false}
     />
   );
 };

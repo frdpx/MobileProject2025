@@ -28,12 +28,25 @@ import {
   loginUser,
   logoutUser,
   updateUserProfile,
+  forgotPassword as forgotPasswordAPI,
 } from "../firebase/authService";
+import { auth } from "../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   loading: false,
   error: null,
+
+    init: () => {
+    onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        set({ user: { uid: fbUser.uid }, isLoggedIn: true, error: null });
+      } else {
+        set({ user: null, isLoggedIn: false });
+      }
+    });
+  },
 
   register: async (data) => {
     set({ loading: true });
@@ -76,5 +89,10 @@ export const useAuthStore = create((set, get) => ({
       console.error(" Failed to update user:", err);
       throw err;
     }
+  },
+
+    forgotPassword: async (email) => {
+    if (!email?.trim()) throw new Error("Please enter your email");
+    await forgotPasswordAPI(email.trim());
   },
 }));
