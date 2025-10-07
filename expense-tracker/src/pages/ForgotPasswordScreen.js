@@ -1,36 +1,41 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Alert, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import AuthBackground from "../components/common/AuthBackground";
 import FormInput from "../components/common/FormInput";
-import PasswordInput from "../components/common/PasswordInput";
 import Button from "../components/common/Button";
+import { useAuthStore } from "../store/useAuthStore";
 
 export const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const forgotPassword = useAuthStore((s) => s.forgotPassword);
 
-  const handleChangePassword = () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert("❌ Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
-      return;
+  const handleSend = async () => {
+    try {
+      await forgotPassword(email);
+      Alert.alert(
+        "Check your email",
+        "We sent you a password reset link."
+      );
+      navigation.goBack(); // หรือ navigation.navigate("Login")
+    } catch (e) {
+      Alert.alert("Reset failed", e?.message ?? "Please try again");
     }
-    if (password !== confirmPassword) {
-      Alert.alert("❌ Error", "Passwords ไม่ตรงกัน");
-      return;
-    }
-    navigation.navigate("Login"); // กลับหน้า Login
   };
 
   return (
     <AuthBackground header={<Text style={styles.headerTitle}>Forgot Password</Text>}>
-      <FormInput label="Email" placholder="example@example.com" value={email} onChangeText={setEmail} />
-      <PasswordInput label="New Password" value={password} onChangeText={setPassword} />
-      <PasswordInput label="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} />
-      <Button title="Change Password" onPress={handleChangePassword} width="100%" color="black" textColor="#fff" />
+      <FormInput
+        label="Email"
+        placeholder="example@example.com"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <Button title="Send reset link" onPress={handleSend} width="100%" color="black" textColor="#fff" />
     </AuthBackground>
   );
 };

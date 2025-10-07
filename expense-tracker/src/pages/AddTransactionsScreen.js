@@ -8,6 +8,9 @@ import {
   Alert,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+
 import Calendar from "../components/calendar/calendar";
 import { useTransactionStore } from "../store/useTransactions";
 import { useAuthStore } from "../store/useAuthStore";
@@ -72,7 +75,7 @@ export const AddTransactionsScreen = () => {
 
   const { addTransaction, updateTransaction, deleteTransaction } =
     useTransactionStore();
-  const user = useAuthStore((state) => state.user); // ดึง uid
+  const user = useAuthStore((state) => state.user);
 
   const [type, setType] = useState(transaction?.type || "income");
   const [categoryOptions, setCategoryOptions] = useState(
@@ -89,7 +92,6 @@ export const AddTransactionsScreen = () => {
   );
   const [comment, setComment] = useState(transaction?.comment || "");
 
-  // เปลี่ยน category ตาม type
   useEffect(() => {
     const options = type === "income" ? incomeMenu : expensesMenu;
     setCategoryOptions(options);
@@ -105,7 +107,6 @@ export const AddTransactionsScreen = () => {
 
   const handleResetAmount = () => setAmount("0");
 
-  // บันทึกข้อมูล (เพิ่ม/แก้ไข)
   const handleSave = async () => {
     if (!user?.uid) {
       Alert.alert("Error", "You must be logged in to save transactions");
@@ -125,7 +126,7 @@ export const AddTransactionsScreen = () => {
       if (mode === "edit" && transaction) {
         await updateTransaction(transaction.id, newTransaction);
       } else {
-        const newId = await addTransaction(user.uid, newTransaction); //รับ id กลับ
+        const newId = await addTransaction(user.uid, newTransaction);
         console.log("Saved new transaction ID:", newId);
       }
 
@@ -136,7 +137,6 @@ export const AddTransactionsScreen = () => {
     }
   };
 
-  // ลบ
   const handleDelete = async () => {
     if (transaction) {
       await deleteTransaction(transaction.id);
@@ -147,91 +147,93 @@ export const AddTransactionsScreen = () => {
   const displayAmount = (parseInt(amount, 10) / 100).toFixed(2);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>
-        {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
-      </Text>
+    <SafeAreaView style={styles.safe}>
+      <StatusBar style="dark" />
+      <View style={styles.container}>
+        <Text style={styles.headerText}>
+          {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
+        </Text>
 
-      <View style={styles.dropdownRow}>
-        <Dropdown
-          items={[
-            { label: "Income", value: "income" },
-            { label: "Expenses", value: "expense" },
-          ]}
-          value={type}
-          onChangeValue={setType}
-          style={styles.typeDropdown}
-        />
-        <Dropdown
-          items={categoryOptions}
-          value={category}
-          onChangeValue={setCategory}
-          style={styles.categoryDropdown}
-        />
-      </View>
+        <View style={styles.dropdownRow}>
+          <Dropdown
+            items={[
+              { label: "Income", value: "income" },
+              { label: "Expenses", value: "expense" },
+            ]}
+            value={type}
+            onChangeValue={setType}
+            style={styles.typeDropdown}
+          />
+          <Dropdown
+            items={categoryOptions}
+            value={category}
+            onChangeValue={setCategory}
+            style={styles.categoryDropdown}
+          />
+        </View>
 
-      <View style={styles.calendarWrapper}>
-        <Calendar label="Date" value={date} onChange={setDate} />
-      </View>
+        <View style={styles.calendarWrapper}>
+          <Calendar label="Date" value={date} onChange={setDate} />
+        </View>
 
-      <Text style={styles.amountText}>฿ {displayAmount}</Text>
+        <Text style={styles.amountText}>฿ {displayAmount}</Text>
 
-      <View style={styles.numpad}>
-        {[
-          ["1", "2", "3"],
-          ["4", "5", "6"],
-          ["7", "8", "9"],
-          ["✕", "0", "→"],
-        ].map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.numRow}>
-            {row.map((key) => (
-              <Pressable
-                key={key}
-                style={[
-                  styles.numButton,
-                  key === "✕" && styles.resetButton,
-                  key === "→" && styles.saveButton,
-                ]}
-                onPress={() => {
-                  if (key === "✕") handleResetAmount();
-                  else if (key === "→") handleSave();
-                  else handlePressNumber(key);
-                }}
-              >
-                <Text
-                  style={[styles.numText, key === "→" && styles.saveArrowText]}
+        <View style={styles.numpad}>
+          {[
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+            ["✕", "0", "→"],
+          ].map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.numRow}>
+              {row.map((key) => (
+                <Pressable
+                  key={key}
+                  style={[
+                    styles.numButton,
+                    key === "✕" && styles.resetButton,
+                    key === "→" && styles.saveButton,
+                  ]}
+                  onPress={() => {
+                    if (key === "✕") handleResetAmount();
+                    else if (key === "→") handleSave();
+                    else handlePressNumber(key);
+                  }}
                 >
-                  {key}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        ))}
+                  <Text
+                    style={[styles.numText, key === "→" && styles.saveArrowText]}
+                  >
+                    {key}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          ))}
+        </View>
+
+        <TextInput
+          style={styles.commentInput}
+          placeholder="Add comment..."
+          value={comment}
+          onChangeText={setComment}
+          multiline
+        />
+
+        {mode === "edit" && (
+          <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
+            <Text style={styles.deleteText}>Delete</Text>
+          </Pressable>
+        )}
       </View>
-
-      <TextInput
-        style={styles.commentInput}
-        placeholder="Add comment..."
-        value={comment}
-        onChangeText={setComment}
-        multiline
-      />
-
-      {/* Delete */}
-      {mode === "edit" && (
-        <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
-          <Text style={styles.deleteText}>Delete</Text>
-        </Pressable>
-      )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#f9f9f9" }, // กันชิดขอบบน/รอยบาก
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 30,
     backgroundColor: "#f9f9f9",
   },
   headerText: {
