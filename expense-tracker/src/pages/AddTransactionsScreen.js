@@ -16,6 +16,7 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons"; 
 import Calendar from "../components/calendar/calendar";
 import { useTransactionStore } from "../store/useTransactions";
 import { useAuthStore } from "../store/useAuthStore";
@@ -105,7 +106,6 @@ export const AddTransactionsScreen = () => {
     if (!transaction) setCategory(opts[0].value);
   }, [type]);
 
-  // <-- เอา type annotation ออก ให้เป็น JS ธรรมดา
   const handlePressNumber = (num) => {
     if (amount.length < 9) {
       const newAmount = amount + num;
@@ -128,7 +128,6 @@ export const AddTransactionsScreen = () => {
       } else {
         await addTransaction(user.uid, newTransaction);
       }
-      // <-- เอา "as never" ออก
       navigation.navigate("MainTab", { screen: "Home" });
     } catch (error) {
       Alert.alert("Error", "Failed to save transaction");
@@ -139,13 +138,11 @@ export const AddTransactionsScreen = () => {
   const handleDelete = async () => {
     if (transaction) {
       await deleteTransaction(transaction.id);
-      // <-- เอา "as never" ออก
       navigation.navigate("MainTab", { screen: "Home" });
     }
   };
 
   const displayAmount = (parseInt(amount, 10) / 100).toFixed(2);
-
   const commentAccessoryId = "commentDoneAccessory";
 
   return (
@@ -158,9 +155,23 @@ export const AddTransactionsScreen = () => {
       >
         <Pressable style={styles.flex1} onPress={Keyboard.dismiss}>
           <View style={styles.container}>
-            <Text style={styles.headerText}>
-              {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
-            </Text>
+ 
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.backBtn}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="chevron-back" size={26} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerText}>
+                {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
+              </Text>
+              {/* spacer ให้ title อยู่กลางจริง ๆ */}
+              <View style={{ width: 26 }} />
+            </View>
 
             <View style={styles.dropdownRow}>
               <Dropdown
@@ -255,12 +266,12 @@ export const AddTransactionsScreen = () => {
                 </TouchableOpacity>
               </View>
             )}
-
+{/* 
             {mode === "edit" && (
               <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
                 <Text style={styles.deleteText}>Delete</Text>
               </Pressable>
-            )}
+            )} */}
           </View>
         </Pressable>
       </KeyboardAvoidingView>
@@ -281,11 +292,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
   },
 
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  backBtn: {
+    width: 26,
+    height: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerText: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#000",
-    marginBottom: 12,
+    textAlign: "center",
+    flexShrink: 1,
   },
 
   dropdownRow: {
@@ -293,17 +317,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     justifyContent: "space-between",
     zIndex: 20,
+    position: "relative",
+    elevation: 20,
   },
   typeDropdown: { flex: 0.4, backgroundColor: "#e6f3ff", borderRadius: 10 },
   categoryDropdown: { flex: 0.6, backgroundColor: "#e0f7f3", borderRadius: 10 },
 
   calendarWrapper: {
     width: "100%",
-    // backgroundColor: "#f0e6ff",
-    // borderRadius: 10,
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 35,
     zIndex: 10,

@@ -8,6 +8,7 @@ import {
   Platform,
   InputAccessoryView,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,31 +34,37 @@ export const SignUpSreen = () => {
   const { register, loading } = useAuthStore();
 
   const handleSignUp = async () => {
-    if (
-      !firstname ||
-      !lastname ||
-      !email ||
-      !mobile ||
-      !dob ||
-      !password ||
-      !confirmPassword
-    ) {
-      Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
+  if (!firstname || !lastname || !email || !mobile || !dob || !password || !confirmPassword) {
+    Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
+    return;
+  }
+  if (password !== confirmPassword) {
+    Alert.alert("Error", "Passwords do not match!");
+    return;
+  }
+
+  try {
+    // ป้องกัน dob เป็น undefined หรือ parse ไม่ได้
+    if (!(dob instanceof Date) || isNaN(dob.getTime())) {
+      Alert.alert("Error", "กรุณาเลือกวันเกิดให้ถูกต้อง");
       return;
     }
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match!");
-      return;
-    }
-    try {
-      await register({
-        firstName: firstname,
-        lastName: lastname,
-        email,
-        mobile,
-        dateOfBirth: dob.toISOString(),
-        password,
-      });
+
+    // เก็บแบบ date-only ไม่ผูก timezone (กันเพี้ยน -1 วัน)
+    const y = dob.getFullYear();
+    const m = String(dob.getMonth() + 1).padStart(2, "0");
+    const d = String(dob.getDate()).padStart(2, "0");
+    const dateOfBirth = `${y}-${m}-${d}`;
+
+    await register({
+      firstName: firstname,
+      lastName: lastname,
+      email,
+      mobile,
+      dateOfBirth, // << ส่งสตริง YYYY-MM-DD เข้าไป
+      password,
+    });
+    
       Alert.alert("Success", "Account created successfully!");
       navigation.navigate("Login");
     } catch (error) {
@@ -70,100 +77,116 @@ export const SignUpSreen = () => {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
-        <ScrollView
-          contentContainerStyle={styles.body}
-          keyboardShouldPersistTaps="handled"
-        >
-          <FormInput
-            label={"First Name"}
-            placholder={"Please input your first name"}
-            value={firstname}
-            onChangeText={setFirstname}
-            returnKeyType="next"
-          />
+      <KeyboardAvoidingView
+        style={styles.flex1}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // ถ้าหัวมี Header สูง ๆ ปรับ offset ได้ เช่น 8–24
+        keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
+      >
+        {/* แตะพื้นหลังเพื่อปิดคีย์บอร์ด */}
+        <Pressable style={styles.flex1} onPress={Keyboard.dismiss}>
+          <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
+            <ScrollView
+              contentContainerStyle={styles.body}
+              keyboardShouldPersistTaps="handled"
+            >
+              <FormInput
+                label={"First Name"}
+                placholder={"Please input your first name"}
+                value={firstname}
+                onChangeText={setFirstname}
+                returnKeyType="next"
+              />
 
-          <FormInput
-            label={"Last Name"}
-            placholder={"Please input your last name"}
-            value={lastname}
-            onChangeText={setLastname}
-            returnKeyType="next"
-          />
+              <FormInput
+                label={"Last Name"}
+                placholder={"Please input your last name"}
+                value={lastname}
+                onChangeText={setLastname}
+                returnKeyType="next"
+              />
 
-          <FormInput
-            label={"Email"}
-            placholder={"Please input your email"}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            returnKeyType="next"
-          />
+              <FormInput
+                label={"Email"}
+                placholder={"Please input your email"}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="next"
+              />
 
-          {/* Mobile number */}
-          <FormInput
-            label={"Mobile Number"}
-            placholder={"Please input your mobile number"}
-            value={mobile}
-            onChangeText={setMobile}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "phone-pad"}
-            returnKeyType="done"
-            blurOnSubmit
-            onSubmitEditing={Keyboard.dismiss}
-            inputAccessoryViewID={Platform.OS === "ios" ? accessoryId : undefined}
-          />
+              {/* Mobile number */}
+              <FormInput
+                label={"Mobile Number"}
+                placholder={"Please input your mobile number"}
+                value={mobile}
+                onChangeText={setMobile}
+                keyboardType={Platform.OS === "ios" ? "number-pad" : "phone-pad"}
+                returnKeyType="done"
+                blurOnSubmit
+                onSubmitEditing={Keyboard.dismiss}
+                inputAccessoryViewID={Platform.OS === "ios" ? accessoryId : undefined}
+              />
 
-          {/* แถบปุ่ม Done บน iOS สำหรับคีย์บอร์ด number-pad */}
-          {Platform.OS === "ios" && (
-            <InputAccessoryView nativeID={accessoryId}>
-              <View style={styles.accessoryBar}>
-                <Pressable onPress={Keyboard.dismiss} style={styles.doneBtn}>
-                  <Text style={styles.doneText}>Done</Text>
+              {/* แถบ Done สำหรับ iOS number-pad */}
+              {Platform.OS === "ios" && (
+                <InputAccessoryView nativeID={accessoryId}>
+                  <View style={styles.accessoryBar}>
+                    <Pressable onPress={Keyboard.dismiss} style={styles.doneBtn}>
+                      <Text style={styles.doneText}>Done</Text>
+                    </Pressable>
+                  </View>
+                </InputAccessoryView>
+              )}
+
+              {/* DOB (ถูกล็อกให้พิมพ์ไม่ได้อยู่แล้ว) */}
+              <View style={{ marginBottom: 14 }}>
+                <Calendar label="Date of Birth" value={dob} onChange={setDob} />
+              </View>
+
+              <PasswordInput value={password} onChangeText={setPassword} />
+              <PasswordInput
+                label="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+
+              <Button
+                title={loading ? "Creating..." : "Sign Up"}
+                onPress={handleSignUp}
+                width={"100%"}
+                color={"black"}
+                textColor={"#fff"}
+              />
+
+              <View style={styles.footerRow}>
+                <Text style={styles.footer}>Already have an account? </Text>
+                <Pressable onPress={() => navigation.navigate("Login")}>
+                  <Text style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}>
+                    Log In
+                  </Text>
                 </Pressable>
               </View>
-            </InputAccessoryView>
-          )}
 
-          {/* Calendar component (คุณทำให้พิมพ์ไม่ได้ไว้อยู่แล้ว) */}
-          <View style={{ marginBottom: 14 }}>
-            <Calendar label="Date of Birth" value={dob} onChange={setDob} />
-          </View>
-
-          <PasswordInput value={password} onChangeText={setPassword} />
-          <PasswordInput
-            label="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-
-          <Button
-            title={loading ? "Creating..." : "Sign Up"}
-            onPress={handleSignUp}
-            width={"100%"}
-            color={"black"}
-            textColor={"#fff"}
-          />
-
-          <View style={styles.footerRow}>
-            <Text style={styles.footer}>Already have an account? </Text>
-            <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text
-                style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}
-              >
-                Log In
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </AuthBackground>
+              <View style={{ height: 12 }} />
+            </ScrollView>
+          </AuthBackground>
+        </Pressable>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#fff" }, 
+  flex1: { flex: 1 },
+  screen: { flex: 1, backgroundColor: "#fff" },
   headerTitle: { fontSize: 32, fontWeight: "bold", color: "#000" },
+  // body: {
+  //   paddingHorizontal: 20,
+  //   paddingBottom: 16,
+  //   gap: 12, // ช่องไฟสม่ำเสมอระหว่างฟิลด์
+  // },
   footerRow: {
     flexDirection: "row",
     justifyContent: "center",
