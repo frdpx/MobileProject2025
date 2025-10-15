@@ -42,6 +42,7 @@ export const HomeScreen = () => {
       },
     ]);
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>

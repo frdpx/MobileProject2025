@@ -6,11 +6,16 @@ import {
   StyleSheet,
   TextInput,
   Alert,
+  Keyboard,
+  useWindowDimensions,
+  KeyboardAvoidingView,
+  Platform,
+  InputAccessoryView,
+  TouchableOpacity,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-
 import Calendar from "../components/calendar/calendar";
 import { useTransactionStore } from "../store/useTransactions";
 import { useAuthStore } from "../store/useAuthStore";
@@ -35,15 +40,10 @@ const expensesMenu = [
 
 const Dropdown = ({ items, value, onChangeValue, style }) => {
   const [open, setOpen] = useState(false);
-  const selectedLabel =
-    items.find((item) => item.value === value)?.label || "Select";
-
+  const selectedLabel = items.find((i) => i.value === value)?.label || "Select";
   return (
     <View style={[styles.dropdownContainer, style]}>
-      <Pressable
-        style={styles.dropdownButton}
-        onPress={() => setOpen((prev) => !prev)}
-      >
+      <Pressable style={styles.dropdownButton} onPress={() => setOpen((p) => !p)}>
         <Text style={styles.dropdownButtonText}>{selectedLabel}</Text>
       </Pressable>
       {open && (
@@ -69,42 +69,49 @@ const Dropdown = ({ items, value, onChangeValue, style }) => {
 export const AddTransactionsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const { width, height } = useWindowDimensions();
 
   const transaction = route.params?.transaction ?? null;
   const mode = route.params?.mode ?? "add";
 
   const { addTransaction, updateTransaction, deleteTransaction } =
     useTransactionStore();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((s) => s.user);
 
   const [type, setType] = useState(transaction?.type || "income");
   const [categoryOptions, setCategoryOptions] = useState(
     (transaction?.type || "income") === "income" ? incomeMenu : expensesMenu
   );
-  const [category, setCategory] = useState(
-    transaction?.category || incomeMenu[0].value
-  );
-  const [date, setDate] = useState(
-    transaction?.date ? new Date(transaction.date) : new Date()
-  );
-  const [amount, setAmount] = useState(
-    transaction ? String(Math.round(transaction.amount * 100)) : "0"
-  );
+  const [category, setCategory] = useState(transaction?.category || incomeMenu[0].value);
+  const [date, setDate] = useState(transaction?.date ? new Date(transaction.date) : new Date());
+  const [amount, setAmount] = useState(transaction ? String(Math.round(transaction.amount * 100)) : "0");
   const [comment, setComment] = useState(transaction?.comment || "");
 
+  const amountFont = Math.round(Math.min(width * 0.12, height * 0.06));
+
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   useEffect(() => {
-    const options = type === "income" ? incomeMenu : expensesMenu;
-    setCategoryOptions(options);
-    if (!transaction) setCategory(options[0].value);
+    const sh = Keyboard.addListener("keyboardDidShow", () => setKeyboardOpen(true));
+    const hi = Keyboard.addListener("keyboardDidHide", () => setKeyboardOpen(false));
+    return () => {
+      sh.remove();
+      hi.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const opts = type === "income" ? incomeMenu : expensesMenu;
+    setCategoryOptions(opts);
+    if (!transaction) setCategory(opts[0].value);
   }, [type]);
 
+  // <-- เอา type annotation ออก ให้เป็น JS ธรรมดา
   const handlePressNumber = (num) => {
     if (amount.length < 9) {
       const newAmount = amount + num;
       setAmount(newAmount.replace(/^0+/, "") || "0");
     }
   };
-
   const handleResetAmount = () => setAmount("0");
 
   const handleSave = async () => {
@@ -112,24 +119,16 @@ export const AddTransactionsScreen = () => {
       Alert.alert("Error", "You must be logged in to save transactions");
       return;
     }
-
     const value = parseFloat((parseInt(amount, 10) / 100).toFixed(2));
-    const newTransaction = {
-      type,
-      category,
-      date: date.toISOString(),
-      amount: value,
-      comment,
-    };
+    const newTransaction = { type, category, date: date.toISOString(), amount: value, comment };
 
     try {
       if (mode === "edit" && transaction) {
         await updateTransaction(transaction.id, newTransaction);
       } else {
-        const newId = await addTransaction(user.uid, newTransaction);
-        console.log("Saved new transaction ID:", newId);
+        await addTransaction(user.uid, newTransaction);
       }
-
+      // <-- เอา "as never" ออก
       navigation.navigate("MainTab", { screen: "Home" });
     } catch (error) {
       Alert.alert("Error", "Failed to save transaction");
@@ -140,160 +139,238 @@ export const AddTransactionsScreen = () => {
   const handleDelete = async () => {
     if (transaction) {
       await deleteTransaction(transaction.id);
+      // <-- เอา "as never" ออก
       navigation.navigate("MainTab", { screen: "Home" });
     }
   };
 
   const displayAmount = (parseInt(amount, 10) / 100).toFixed(2);
 
+  const commentAccessoryId = "commentDoneAccessory";
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
-      <View style={styles.container}>
-        <Text style={styles.headerText}>
-          {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
-        </Text>
+      <KeyboardAvoidingView
+        style={styles.flex1}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
+      >
+        <Pressable style={styles.flex1} onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <Text style={styles.headerText}>
+              {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
+            </Text>
 
-        <View style={styles.dropdownRow}>
-          <Dropdown
-            items={[
-              { label: "Income", value: "income" },
-              { label: "Expenses", value: "expense" },
-            ]}
-            value={type}
-            onChangeValue={setType}
-            style={styles.typeDropdown}
-          />
-          <Dropdown
-            items={categoryOptions}
-            value={category}
-            onChangeValue={setCategory}
-            style={styles.categoryDropdown}
-          />
-        </View>
-
-        <View style={styles.calendarWrapper}>
-          <Calendar label="Date" value={date} onChange={setDate} />
-        </View>
-
-        <Text style={styles.amountText}>฿ {displayAmount}</Text>
-
-        <View style={styles.numpad}>
-          {[
-            ["1", "2", "3"],
-            ["4", "5", "6"],
-            ["7", "8", "9"],
-            ["✕", "0", "→"],
-          ].map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.numRow}>
-              {row.map((key) => (
-                <Pressable
-                  key={key}
-                  style={[
-                    styles.numButton,
-                    key === "✕" && styles.resetButton,
-                    key === "→" && styles.saveButton,
-                  ]}
-                  onPress={() => {
-                    if (key === "✕") handleResetAmount();
-                    else if (key === "→") handleSave();
-                    else handlePressNumber(key);
-                  }}
-                >
-                  <Text
-                    style={[styles.numText, key === "→" && styles.saveArrowText]}
-                  >
-                    {key}
-                  </Text>
-                </Pressable>
-              ))}
+            <View style={styles.dropdownRow}>
+              <Dropdown
+                items={[
+                  { label: "Income", value: "income" },
+                  { label: "Expenses", value: "expense" },
+                ]}
+                value={type}
+                onChangeValue={setType}
+                style={styles.typeDropdown}
+              />
+              <Dropdown
+                items={categoryOptions}
+                value={category}
+                onChangeValue={setCategory}
+                style={styles.categoryDropdown}
+              />
             </View>
-          ))}
-        </View>
 
-        <TextInput
-          style={styles.commentInput}
-          placeholder="Add comment..."
-          value={comment}
-          onChangeText={setComment}
-          multiline
-        />
+            <View style={styles.calendarWrapper}>
+              <Calendar label="Date" value={date} onChange={setDate} />
+            </View>
 
-        {mode === "edit" && (
-          <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
-            <Text style={styles.deleteText}>Delete</Text>
-          </Pressable>
-        )}
-      </View>
+            <Text
+              style={[styles.amountText, { fontSize: amountFont }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
+              ฿ {displayAmount}
+            </Text>
+
+            {!keyboardOpen && (
+              <View style={styles.numpad}>
+                {[
+                  ["1", "2", "3"],
+                  ["4", "5", "6"],
+                  ["7", "8", "9"],
+                  ["✕", "0", "→"],
+                ].map((row, idx) => (
+                  <View key={idx} style={styles.numRow}>
+                    {row.map((key) => (
+                      <Pressable
+                        key={key}
+                        style={[
+                          styles.numButton,
+                          key === "✕" && styles.resetButton,
+                          key === "→" && styles.saveButton,
+                        ]}
+                        onPress={() => {
+                          if (key === "✕") handleResetAmount();
+                          else if (key === "→") handleSave();
+                          else handlePressNumber(key);
+                        }}
+                      >
+                        <Text style={[styles.numText, key === "→" && styles.saveArrowText]}>
+                          {key}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <TextInput
+              style={styles.commentInput}
+              placeholder="Add comment..."
+              value={comment}
+              onChangeText={setComment}
+              multiline
+              returnKeyType="done"
+              blurOnSubmit
+              onSubmitEditing={Keyboard.dismiss}
+              inputAccessoryViewID={Platform.OS === "ios" ? commentAccessoryId : undefined}
+            />
+
+            {Platform.OS === "ios" && (
+              <InputAccessoryView nativeID={commentAccessoryId}>
+                <View style={styles.accessoryBar}>
+                  <Pressable onPress={Keyboard.dismiss} style={styles.doneBtn}>
+                    <Text style={styles.doneText}>Done</Text>
+                  </Pressable>
+                </View>
+              </InputAccessoryView>
+            )}
+
+            {Platform.OS === "android" && keyboardOpen && (
+              <View style={styles.androidBar}>
+                <TouchableOpacity onPress={Keyboard.dismiss} style={styles.androidCloseBtn}>
+                  <Text style={styles.androidCloseText}>Close keyboard</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {mode === "edit" && (
+              <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
+                <Text style={styles.deleteText}>Delete</Text>
+              </Pressable>
+            )}
+          </View>
+        </Pressable>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
+const CIRCLE = 76;
+
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#f9f9f9" }, // กันชิดขอบบน/รอยบาก
+  flex1: { flex: 1 },
+  safe: { flex: 1, backgroundColor: "#f9f9f9" },
+
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
     backgroundColor: "#f9f9f9",
   },
+
   headerText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#000",
-    marginBottom: 20,
+    marginBottom: 12,
   },
+
   dropdownRow: {
     flexDirection: "row",
-    marginTop: 16,
-    marginBottom: 16,
+    marginBottom: 20,
     justifyContent: "space-between",
+    zIndex: 20,
   },
   typeDropdown: { flex: 0.4, backgroundColor: "#e6f3ff", borderRadius: 10 },
   categoryDropdown: { flex: 0.6, backgroundColor: "#e0f7f3", borderRadius: 10 },
+
   calendarWrapper: {
     width: "100%",
-    backgroundColor: "#f0e6ff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 20,
+    // backgroundColor: "#f0e6ff",
+    // borderRadius: 10,
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    // paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 35,
+    zIndex: 10,
+    elevation: 10,
   },
+
   amountText: {
-    fontSize: 48,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
   },
-  numpad: { marginBottom: 16 },
+
+  numpad: {
+    flexShrink: 0,
+    marginBottom: 20,
+    gap: 10,
+  },
   numRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 12,
+    justifyContent: "space-between",
+    gap: 10,
   },
   numButton: {
-    width: 90,
-    height: 90,
-    marginHorizontal: 10,
-    borderRadius: 45,
+    width: CIRCLE,
+    height: CIRCLE,
+    borderRadius: CIRCLE / 2,
     backgroundColor: "#eee",
     justifyContent: "center",
     alignItems: "center",
   },
-  numText: { fontSize: 26, fontWeight: "bold", color: "#333" },
+  numText: { fontSize: 22, fontWeight: "bold", color: "#333" },
   resetButton: { backgroundColor: "#f9c0c0" },
   saveButton: { backgroundColor: "#000" },
-  saveArrowText: { color: "#fff", fontSize: 26, fontWeight: "bold" },
+  saveArrowText: { color: "#fff", fontSize: 22, fontWeight: "bold" },
+
   commentInput: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
     padding: 12,
     backgroundColor: "#fff",
-    minHeight: 60,
-    marginBottom: 20,
+    minHeight: 50,
+    marginTop: 4,
   },
+
+  accessoryBar: {
+    backgroundColor: "#f2f2f2",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: "#ccc",
+    alignItems: "flex-end",
+    paddingRight: 8,
+  },
+  doneBtn: { paddingVertical: 10, paddingHorizontal: 16 },
+  doneText: { color: "#007aff", fontWeight: "600", fontSize: 16 },
+
+  androidBar: {
+    alignItems: "flex-end",
+    paddingTop: 6,
+  },
+  androidCloseBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#000",
+    borderRadius: 8,
+  },
+  androidCloseText: { color: "#fff", fontWeight: "600" },
+
   dropdownContainer: { position: "relative" },
   dropdownButton: {
     padding: 12,
@@ -317,13 +394,14 @@ const styles = StyleSheet.create({
   },
   dropdownItem: { padding: 12 },
   dropdownItemText: { fontSize: 16, color: "#333" },
+
   deleteFullButton: {
     backgroundColor: "#f5e0a6",
-    height: 50,
+    height: 46,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 10,
   },
   deleteText: { fontSize: 18, fontWeight: "bold", color: "#000" },
 });

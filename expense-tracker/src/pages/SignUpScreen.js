@@ -1,6 +1,16 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, View, Alert } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  Alert,
+  Keyboard,
+  Platform,
+  InputAccessoryView,
+  ScrollView,
+} from "react-native";
 import { Text } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AuthBackground from "../components/common/AuthBackground";
 import Button from "../components/common/Button";
 import { useNavigation } from "@react-navigation/native";
@@ -21,6 +31,7 @@ export const SignUpSreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const { register, loading } = useAuthStore();
+
   const handleSignUp = async () => {
     if (
       !firstname ||
@@ -34,12 +45,10 @@ export const SignUpSreen = () => {
       Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
-
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match!");
       return;
     }
-
     try {
       await register({
         firstName: firstname,
@@ -49,7 +58,6 @@ export const SignUpSreen = () => {
         dateOfBirth: dob.toISOString(),
         password,
       });
-
       Alert.alert("Success", "Account created successfully!");
       navigation.navigate("Login");
     } catch (error) {
@@ -58,85 +66,118 @@ export const SignUpSreen = () => {
     }
   };
 
+  const accessoryId = "mobileDoneAccessory";
+
   return (
-    <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
-      <FormInput
-        label={"First Name"}
-        placholder={"Please input your first name"}
-        value={firstname}
-        onChangeText={setFirstname}
-      />
+    <SafeAreaView style={styles.screen}>
+      <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
+        <ScrollView
+          contentContainerStyle={styles.body}
+          keyboardShouldPersistTaps="handled"
+        >
+          <FormInput
+            label={"First Name"}
+            placholder={"Please input your first name"}
+            value={firstname}
+            onChangeText={setFirstname}
+            returnKeyType="next"
+          />
 
-      <FormInput
-        label={"Last Name"}
-        placholder={"Please input your last name"}
-        value={lastname}
-        onChangeText={setLastname}
-      />
+          <FormInput
+            label={"Last Name"}
+            placholder={"Please input your last name"}
+            value={lastname}
+            onChangeText={setLastname}
+            returnKeyType="next"
+          />
 
-      <FormInput
-        label={"Email"}
-        placholder={"Please input your email"}
-        value={email}
-        onChangeText={setEmail}
-      />
+          <FormInput
+            label={"Email"}
+            placholder={"Please input your email"}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            returnKeyType="next"
+          />
 
-      <FormInput
-        label={"Mobile Number"}
-        placholder={"Please input your mobile number"}
-        value={mobile}
-        onChangeText={setMobile}
-        keyboardType="phone-pad"
-      />
+          {/* Mobile number */}
+          <FormInput
+            label={"Mobile Number"}
+            placholder={"Please input your mobile number"}
+            value={mobile}
+            onChangeText={setMobile}
+            keyboardType={Platform.OS === "ios" ? "number-pad" : "phone-pad"}
+            returnKeyType="done"
+            blurOnSubmit
+            onSubmitEditing={Keyboard.dismiss}
+            inputAccessoryViewID={Platform.OS === "ios" ? accessoryId : undefined}
+          />
 
-      {/* Calendar component */}
-      <Calendar label="Date of Birth" value={dob} onChange={setDob} />
+          {/* แถบปุ่ม Done บน iOS สำหรับคีย์บอร์ด number-pad */}
+          {Platform.OS === "ios" && (
+            <InputAccessoryView nativeID={accessoryId}>
+              <View style={styles.accessoryBar}>
+                <Pressable onPress={Keyboard.dismiss} style={styles.doneBtn}>
+                  <Text style={styles.doneText}>Done</Text>
+                </Pressable>
+              </View>
+            </InputAccessoryView>
+          )}
 
-      <PasswordInput value={password} onChangeText={setPassword} />
+          {/* Calendar component (คุณทำให้พิมพ์ไม่ได้ไว้อยู่แล้ว) */}
+          <View style={{ marginBottom: 14 }}>
+            <Calendar label="Date of Birth" value={dob} onChange={setDob} />
+          </View>
 
-      <PasswordInput
-        label="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+          <PasswordInput value={password} onChangeText={setPassword} />
+          <PasswordInput
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
 
-      <Button
-        title="Sign Up"
-        onPress={handleSignUp}
-        width={"100%"}
-        color={"black"}
-        textColor={"#fff"}
-      />
+          <Button
+            title={loading ? "Creating..." : "Sign Up"}
+            onPress={handleSignUp}
+            width={"100%"}
+            color={"black"}
+            textColor={"#fff"}
+          />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 10,
-        }}
-      >
-        <Text style={styles.footer}>Already have an account? </Text>
-        <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text
-            style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}
-          >
-            Log In
-          </Text>
-        </Pressable>
-      </View>
-    </AuthBackground>
+          <View style={styles.footerRow}>
+            <Text style={styles.footer}>Already have an account? </Text>
+            <Pressable onPress={() => navigation.navigate("Login")}>
+              <Text
+                style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}
+              >
+                Log In
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </AuthBackground>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#000",
+  screen: { flex: 1, backgroundColor: "#fff" }, 
+  headerTitle: { fontSize: 32, fontWeight: "bold", color: "#000" },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
   },
-  footer: {
-    textAlign: "center",
-    marginTop: 10,
-    color: "#000",
+  footer: { textAlign: "center", color: "#000" },
+  accessoryBar: {
+    backgroundColor: "#f2f2f2",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: "#ccc",
+    alignItems: "flex-end",
+    paddingRight: 12,
   },
+  doneBtn: { paddingVertical: 10, paddingHorizontal: 16 },
+  doneText: { color: "#007aff", fontWeight: "600", fontSize: 16 },
 });
