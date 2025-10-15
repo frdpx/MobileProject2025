@@ -30,29 +30,48 @@ import {
   updateUserProfile,
   forgotPassword as forgotPasswordAPI,
 } from "../firebase/authService";
-import { auth } from "../firebase/config";
+import { auth, db } from "../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
-  loading: false,
+  isLoggedIn: false,
+  loading: true,
   error: null,
 
-    init: () => {
-    onAuthStateChanged(auth, (fbUser) => {
+  init: () => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      console.log("👀 Auth state changed:", fbUser ? fbUser.uid : "No user");
+
       if (fbUser) {
-        set({ user: { uid: fbUser.uid }, isLoggedIn: true, error: null });
+        try {
+          const ref = doc(db, "users", fbUser.uid);
+          const snap = await getDoc(ref);
+          const userData = snap.exists() ? snap.data() : {};
+
+          set({
+            user: { uid: fbUser.uid, email: fbUser.email, ...userData },
+            isLoggedIn: true,
+            loading: false,
+          });
+        } catch (error) {
+          console.error("❌ Failed to fetch Firestore profile:", error);
+          set({ user: { uid: fbUser.uid }, isLoggedIn: true, loading: false });
+        }
       } else {
-        set({ user: null, isLoggedIn: false });
+        set({ user: null, isLoggedIn: false, loading: false });
       }
     });
+
+    return unsubscribe;
   },
 
   register: async (data) => {
     set({ loading: true });
     try {
       const user = await registerUser(data);
-      set({ user, loading: false });
+      set({ user, isLoggedIn: true, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
     }
@@ -91,7 +110,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-    forgotPassword: async (email) => {
+  forgotPassword: async (email) => {
     if (!email?.trim()) throw new Error("Please enter your email");
     await forgotPasswordAPI(email.trim());
   },
