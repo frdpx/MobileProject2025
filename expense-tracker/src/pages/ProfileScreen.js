@@ -7,7 +7,9 @@ import {
   Pressable,
   Modal,
   Alert,
+  ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../components/common/Header";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { balanceData } from "../mock/balanceData";
@@ -25,7 +27,7 @@ export const ProfileScreen = () => {
 
   const openEditModal = (field, value) => {
     setEditingField(field);
-    setTempValue(value);
+    setTempValue(value || "");
     setModalVisible(true);
   };
 
@@ -46,44 +48,46 @@ export const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header balance={balanceData.total} />
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+        <Header balance={balanceData.total} />
 
-      <View style={styles.profileHeader}>
-        <FontAwesome name="user-circle" size={64} color="black" />
-        <Text style={styles.fullName}>
-          {user?.firstName} {user?.lastName}
-        </Text>
-      </View>
+        <View style={styles.profileHeader}>
+          <FontAwesome name="user-circle" size={64} color="black" />
+          <Text style={styles.fullName}>
+            {user?.firstName} {user?.lastName}
+          </Text>
+        </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>First Name</Text>
-        <Pressable onPress={() => openEditModal("firstName", user?.firstName)}>
-          <Text style={styles.input}>{user?.firstName}</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>First Name</Text>
+          <Pressable onPress={() => openEditModal("firstName", user?.firstName)}>
+            <Text style={styles.input}>{user?.firstName}</Text>
+          </Pressable>
+
+          <Text style={styles.label}>Last Name</Text>
+          <Pressable onPress={() => openEditModal("lastName", user?.lastName)}>
+            <Text style={styles.input}>{user?.lastName}</Text>
+          </Pressable>
+
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[styles.input, styles.disabledInput]}
+            value={user?.email}
+            editable={false}
+          />
+
+          <Text style={styles.label}>Date of Birth</Text>
+          <TextInput
+            style={[styles.input, styles.disabledInput]}
+            value={revertFormatDate(user?.dateOfBirth)}
+            editable={false}
+          />
+        </View>
+
+        <Pressable style={styles.signOutBtn} onPress={logout}>
+          <Text style={styles.signOutText}>Sign out</Text>
         </Pressable>
-
-        <Text style={styles.label}>Last Name</Text>
-        <Pressable onPress={() => openEditModal("lastName", user?.lastName)}>
-          <Text style={styles.input}>{user?.lastName}</Text>
-        </Pressable>
-
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={[styles.input, styles.disabledInput]}
-          value={user?.email}
-          editable={false}
-        />
-        <Text style={styles.label}>Date of Birth</Text>
-
-        <TextInput
-          style={[styles.input, styles.disabledInput]}
-          value={revertFormatDate(user?.dateOfBirth)}
-          editable={false}
-        />
-      </View>
-
-      <Pressable style={styles.signOutBtn} onPress={logout}>
-        <Text style={styles.signOutText}>Sign out</Text>
-      </Pressable>
+      </ScrollView>
 
       {/* Modal */}
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -96,7 +100,7 @@ export const ProfileScreen = () => {
               onChangeText={setTempValue}
             />
             <View style={styles.modalButtons}>
-              <Pressable onPress={() => setModalVisible(false)}>
+              <Pressable onPress={() => setModalVisible(false)} style={styles.modalBtn}>
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable
@@ -126,10 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
   },
-  disabledInput: {
-    color: "#555",
-    backgroundColor: "#f2f2f2",
-  },
+  disabledInput: { color: "#555", backgroundColor: "#f2f2f2" },
   signOutBtn: {
     backgroundColor: "#000",
     paddingVertical: 12,
@@ -151,9 +152,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
   modalContainer: {
-    width: "85%",
+    width: "100%",
+    maxWidth: 420,
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
