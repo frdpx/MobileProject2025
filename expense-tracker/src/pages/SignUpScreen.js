@@ -34,42 +34,51 @@ export const SignUpSreen = () => {
   const { register, loading } = useAuthStore();
 
   const handleSignUp = async () => {
-  if (!firstname || !lastname || !email || !mobile || !dob || !password || !confirmPassword) {
-    Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
-    return;
-  }
-  if (password !== confirmPassword) {
-    Alert.alert("Error", "Passwords do not match!");
-    return;
-  }
-
-  try {
-    // ป้องกัน dob เป็น undefined หรือ parse ไม่ได้
-    if (!(dob instanceof Date) || isNaN(dob.getTime())) {
-      Alert.alert("Error", "กรุณาเลือกวันเกิดให้ถูกต้อง");
+    if (
+      !firstname ||
+      !lastname ||
+      !email ||
+      !mobile ||
+      !dob ||
+      !password ||
+      !confirmPassword
+    ) {
+      Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match!");
       return;
     }
 
-    // เก็บแบบ date-only ไม่ผูก timezone (กันเพี้ยน -1 วัน)
-    const y = dob.getFullYear();
-    const m = String(dob.getMonth() + 1).padStart(2, "0");
-    const d = String(dob.getDate()).padStart(2, "0");
-    const dateOfBirth = `${y}-${m}-${d}`;
+    try {
+      // ป้องกัน dob เป็น undefined หรือ parse ไม่ได้
+      if (!(dob instanceof Date) || isNaN(dob.getTime())) {
+        Alert.alert("Error", "กรุณาเลือกวันเกิดให้ถูกต้อง");
+        return;
+      }
 
-    await register({
-      firstName: firstname,
-      lastName: lastname,
-      email,
-      mobile,
-      dateOfBirth, // << ส่งสตริง YYYY-MM-DD เข้าไป
-      password,
-    });
-    
+      // เก็บแบบ date-only ไม่ผูก timezone (กันเพี้ยน -1 วัน)
+      const y = dob.getFullYear();
+      const m = String(dob.getMonth() + 1).padStart(2, "0");
+      const d = String(dob.getDate()).padStart(2, "0");
+      const dateOfBirth = `${y}-${m}-${d}`;
+
+      await register({
+        firstName: firstname,
+        lastName: lastname,
+        email,
+        mobile,
+        dateOfBirth, // << ส่งสตริง YYYY-MM-DD เข้าไป
+        password,
+      });
+
       Alert.alert("Success", "Account created successfully!");
       navigation.navigate("Login");
     } catch (error) {
       console.error("Sign up failed:", error);
       Alert.alert("Error", error.message || "Sign up failed");
+      return;
     }
   };
 
@@ -85,7 +94,9 @@ export const SignUpSreen = () => {
       >
         {/* แตะพื้นหลังเพื่อปิดคีย์บอร์ด */}
         <Pressable style={styles.flex1} onPress={Keyboard.dismiss}>
-          <AuthBackground header={<Text style={styles.headerTitle}>Sign Up</Text>}>
+          <AuthBackground
+            header={<Text style={styles.headerTitle}>Sign Up</Text>}
+          >
             <ScrollView
               contentContainerStyle={styles.body}
               keyboardShouldPersistTaps="handled"
@@ -122,18 +133,25 @@ export const SignUpSreen = () => {
                 placholder={"Please input your mobile number"}
                 value={mobile}
                 onChangeText={setMobile}
-                keyboardType={Platform.OS === "ios" ? "number-pad" : "phone-pad"}
+                keyboardType={
+                  Platform.OS === "ios" ? "number-pad" : "phone-pad"
+                }
                 returnKeyType="done"
                 blurOnSubmit
                 onSubmitEditing={Keyboard.dismiss}
-                inputAccessoryViewID={Platform.OS === "ios" ? accessoryId : undefined}
+                inputAccessoryViewID={
+                  Platform.OS === "ios" ? accessoryId : undefined
+                }
               />
 
               {/* แถบ Done สำหรับ iOS number-pad */}
               {Platform.OS === "ios" && (
                 <InputAccessoryView nativeID={accessoryId}>
                   <View style={styles.accessoryBar}>
-                    <Pressable onPress={Keyboard.dismiss} style={styles.doneBtn}>
+                    <Pressable
+                      onPress={Keyboard.dismiss}
+                      style={styles.doneBtn}
+                    >
                       <Text style={styles.doneText}>Done</Text>
                     </Pressable>
                   </View>
@@ -163,7 +181,12 @@ export const SignUpSreen = () => {
               <View style={styles.footerRow}>
                 <Text style={styles.footer}>Already have an account? </Text>
                 <Pressable onPress={() => navigation.navigate("Login")}>
-                  <Text style={[styles.footer, { color: "#a538abff", fontWeight: "bold" }]}>
+                  <Text
+                    style={[
+                      styles.footer,
+                      { color: "#a538abff", fontWeight: "bold" },
+                    ]}
+                  >
                     Log In
                   </Text>
                 </Pressable>

@@ -45,19 +45,20 @@ export const useAuthStore = create((set, get) => ({
       console.log("👀 Auth state changed:", fbUser ? fbUser.uid : "No user");
 
       if (fbUser) {
-        try {
-          const ref = doc(db, "users", fbUser.uid);
-          const snap = await getDoc(ref);
-          const userData = snap.exists() ? snap.data() : {};
+        const ref = doc(db, "users", fbUser.uid);
+        const snap = await getDoc(ref);
 
+        if (snap.exists()) {
           set({
-            user: { uid: fbUser.uid, email: fbUser.email, ...userData },
+            user: { uid: fbUser.uid, ...snap.data() },
             isLoggedIn: true,
             loading: false,
           });
-        } catch (error) {
-          console.error("❌ Failed to fetch Firestore profile:", error);
-          set({ user: { uid: fbUser.uid }, isLoggedIn: true, loading: false });
+        } else {
+          // 🔴 ถ้าไม่มี document ก็ไม่ให้เข้า Home
+          await auth.signOut();
+          Alert.alert("Account Error", "Your account data was removed.");
+          set({ user: null, isLoggedIn: false, loading: false });
         }
       } else {
         set({ user: null, isLoggedIn: false, loading: false });
@@ -73,7 +74,14 @@ export const useAuthStore = create((set, get) => ({
       const user = await registerUser(data);
       set({ user, isLoggedIn: true, loading: false });
     } catch (err) {
-      set({ error: err.message, loading: false });
+      console.error("Register failed:", err);
+      set({
+        user: null,
+        isLoggedIn: false,
+        error: err.message,
+        loading: false,
+      });
+      throw err;
     }
   },
 
