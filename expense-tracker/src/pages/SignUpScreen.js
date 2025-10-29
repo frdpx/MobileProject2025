@@ -98,7 +98,11 @@ export const SignUpSreen = () => {
             header={<Text style={styles.headerTitle}>Sign Up</Text>}
           >
             <ScrollView
-              contentContainerStyle={styles.body}
+              style={{ flex: 1 }}
+              contentContainerStyle={{
+                paddingBottom: 40,
+                rowGap: 12,  
+          }}
               keyboardShouldPersistTaps="handled"
             >
               <FormInput
