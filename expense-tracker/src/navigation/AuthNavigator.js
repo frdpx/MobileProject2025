@@ -13,8 +13,6 @@ export const AuthNavigator = () => {
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Login" component={LogInScreen} />
-      {/* {(props) => <LogInScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
-      </Stack.Screen> */}
       <Stack.Screen name="Signup" component={SignUpSreen} />
       <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
     </Stack.Navigator>
