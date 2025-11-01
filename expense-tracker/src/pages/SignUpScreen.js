@@ -46,6 +46,10 @@ export const SignUpSreen = () => {
       Alert.alert("Error", "กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
+    if (password.length < 6) {
+      Alert.alert("Error", "Password ต้องมีอย่างน้อย 6 ตัวอักษร");
+      return;
+    }
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match!");
       return;
