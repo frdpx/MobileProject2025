@@ -1,27 +1,3 @@
-// import { create } from "zustand";
-
-// export const useAuthStore = create((set) => ({
-//   user: null,
-//   isLoggedIn: false,
-
-//   login: (userData) =>
-//     set({
-//       user: userData,
-//       isLoggedIn: true,
-//     }),
-
-//   logout: () =>
-//     set({
-//       user: null,
-//       isLoggedIn: false,
-//     }),
-
-//   updateUser: (updates) =>
-//     set((state) => ({
-//       user: { ...state.user, ...updates },
-//     })),
-// }));
-
 import { create } from "zustand";
 import {
   registerUser,
@@ -45,20 +21,24 @@ export const useAuthStore = create((set, get) => ({
       console.log("👀 Auth state changed:", fbUser ? fbUser.uid : "No user");
 
       if (fbUser) {
-        const ref = doc(db, "users", fbUser.uid);
-        const snap = await getDoc(ref);
+        try {
+          const ref = doc(db, "users", fbUser.uid);
+          const snap = await getDoc(ref);
+          const data = snap.exists() ? snap.data() : {};
 
-        if (snap.exists()) {
           set({
-            user: { uid: fbUser.uid, ...snap.data() },
+            user: { uid: fbUser.uid, ...data },
             isLoggedIn: true,
             loading: false,
           });
-        } else {
-          // 🔴 ถ้าไม่มี document ก็ไม่ให้เข้า Home
-          await auth.signOut();
-          Alert.alert("Account Error", "Your account data was removed.");
-          set({ user: null, isLoggedIn: false, loading: false });
+          console.log("Loaded user profile:", data.firstName, data.lastName);
+        } catch (err) {
+          console.error("Failed to fetch Firestore profile:", err);
+          set({
+            user: { uid: fbUser.uid },
+            isLoggedIn: true,
+            loading: false,
+          });
         }
       } else {
         set({ user: null, isLoggedIn: false, loading: false });
@@ -75,12 +55,7 @@ export const useAuthStore = create((set, get) => ({
       set({ user, isLoggedIn: true, loading: false });
     } catch (err) {
       console.error("Register failed:", err);
-      set({
-        user: null,
-        isLoggedIn: false,
-        error: err.message,
-        loading: false,
-      });
+      set({ user: null, isLoggedIn: false, loading: false });
       throw err;
     }
   },
@@ -103,18 +78,14 @@ export const useAuthStore = create((set, get) => ({
 
   updateUser: async (updates) => {
     const { user } = get();
-    if (!user?.uid) {
-      console.warn("⚠️ No user logged in");
-      return;
-    }
+    if (!user?.uid) return console.warn("⚠️ No user logged in");
 
     try {
       await updateUserProfile(user.uid, updates);
       set({ user: { ...user, ...updates } });
-      console.log("User updated successfully in Firestore + Zustand");
+      console.log("✅ User updated successfully");
     } catch (err) {
-      console.error(" Failed to update user:", err);
-      throw err;
+      console.error("❌ Failed to update user:", err);
     }
   },
 

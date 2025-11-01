@@ -1,4 +1,3 @@
-// src/firebase/authService.js
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -27,28 +26,30 @@ export const registerUser = async ({
   try {
     console.log("Registering user...");
 
-    // Create account
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
     const user = userCredential.user;
-
     console.log("Firebase Auth created:", user.uid);
 
-    //  Add Firestore document
-    await setDoc(doc(db, USERS, user.uid), {
+    const profileData = {
       email,
       mobile,
       dateOfBirth,
       firstName,
       lastName,
       createdAt: serverTimestamp(),
-    });
+    };
+    await setDoc(doc(db, USERS, user.uid), profileData);
 
     console.log("Firestore document created successfully!");
-    return user;
+
+    const snap = await getDoc(doc(db, USERS, user.uid));
+    const finalData = snap.exists() ? snap.data() : profileData;
+
+    return { uid: user.uid, ...finalData };
   } catch (error) {
     console.error("Error registering user:", error);
     throw error;
@@ -65,7 +66,6 @@ export const loginUser = async (email, password) => {
     );
     const user = userCredential.user;
 
-    // ดึงข้อมูลโปรไฟล์จาก Firestore
     const userDoc = await getDoc(doc(db, USERS, user.uid));
     const userData = userDoc.exists() ? userDoc.data() : {};
 
