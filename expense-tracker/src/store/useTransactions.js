@@ -12,10 +12,9 @@ export const useTransactionStore = create((set, get) => ({
   error: null,
   unsubscribe: null,
 
-  //realtime
   listenTransactions: (userId) => {
     const { unsubscribe } = get();
-    if (unsubscribe) unsubscribe(); //close old listener
+    if (unsubscribe) unsubscribe();
 
     set({ loading: true });
     const unsub = listenToUserTransactions(userId, (data) => {

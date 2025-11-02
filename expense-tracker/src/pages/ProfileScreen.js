@@ -60,7 +60,9 @@ export const ProfileScreen = () => {
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>First Name</Text>
-          <Pressable onPress={() => openEditModal("firstName", user?.firstName)}>
+          <Pressable
+            onPress={() => openEditModal("firstName", user?.firstName)}
+          >
             <Text style={styles.input}>{user?.firstName}</Text>
           </Pressable>
 
@@ -100,7 +102,10 @@ export const ProfileScreen = () => {
               onChangeText={setTempValue}
             />
             <View style={styles.modalButtons}>
-              <Pressable onPress={() => setModalVisible(false)} style={styles.modalBtn}>
+              <Pressable
+                onPress={() => setModalVisible(false)}
+                style={styles.modalBtn}
+              >
                 <Text>Cancel</Text>
               </Pressable>
               <Pressable
@@ -118,11 +123,27 @@ export const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  profileHeader: { alignItems: "center", marginVertical: 20 },
-  fullName: { fontSize: 20, fontWeight: "bold", marginTop: 10 },
-  inputGroup: { marginVertical: 20, paddingHorizontal: 20 },
-  label: { marginBottom: 5, fontWeight: "600" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  profileHeader: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  fullName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  inputGroup: {
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  label: {
+    marginBottom: 5,
+    fontWeight: "600",
+  },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
@@ -130,7 +151,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
   },
-  disabledInput: { color: "#555", backgroundColor: "#f2f2f2" },
+  disabledInput: {
+    color: "#555",
+    backgroundColor: "#f2f2f2",
+  },
   signOutBtn: {
     backgroundColor: "#000",
     paddingVertical: 12,
@@ -146,7 +170,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  signOutText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  signOutText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   modalBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -161,7 +189,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
   },
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
   modalInput: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -170,7 +202,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
   },
-  modalButtons: { flexDirection: "row", justifyContent: "flex-end" },
-  modalBtn: { marginLeft: 15, paddingVertical: 8, paddingHorizontal: 15 },
-  modalSaveBtn: { backgroundColor: "#000", borderRadius: 10 },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  modalBtn: {
+    marginLeft: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+  },
+  modalSaveBtn: {
+    backgroundColor: "#000",
+    borderRadius: 10,
+  },
 });

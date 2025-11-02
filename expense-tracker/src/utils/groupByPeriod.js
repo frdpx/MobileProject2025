@@ -4,7 +4,6 @@ export const groupByPeriod = (transactions, period, month, year) => {
   return transactions.filter((t) => {
     const date = new Date(t.date);
 
-    // filter ตามเดือน/ปีที่เลือก
     if (date.getMonth() !== month || date.getFullYear() !== year) {
       return false;
     }
@@ -20,7 +19,7 @@ export const groupByPeriod = (transactions, period, month, year) => {
     }
 
     if (period === "month") {
-      return true; // ผ่านเพราะ filter เดือน/ปีไปแล้ว
+      return true;
     }
 
     return false;

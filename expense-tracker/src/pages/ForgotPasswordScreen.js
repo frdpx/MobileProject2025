@@ -15,18 +15,17 @@ export const ForgotPasswordScreen = () => {
   const handleSend = async () => {
     try {
       await forgotPassword(email);
-      Alert.alert(
-        "Check your email",
-        "We sent you a password reset link."
-      );
-      navigation.goBack(); // หรือ navigation.navigate("Login")
+      Alert.alert("Check your email", "We sent you a password reset link.");
+      navigation.goBack();
     } catch (e) {
       Alert.alert("Reset failed", e?.message ?? "Please try again");
     }
   };
 
   return (
-    <AuthBackground header={<Text style={styles.headerTitle}>Forgot Password</Text>}>
+    <AuthBackground
+      header={<Text style={styles.headerTitle}>Forgot Password</Text>}
+    >
       <FormInput
         label="Email"
         placeholder="example@example.com"
@@ -35,11 +34,21 @@ export const ForgotPasswordScreen = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <Button title="Send reset link" onPress={handleSend} width="100%" color="black" textColor="#fff" />
+      <Button
+        title="Send reset link"
+        onPress={handleSend}
+        width="100%"
+        color="black"
+        textColor="#fff"
+      />
     </AuthBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  headerTitle: { fontSize: 32, fontWeight: "bold", color: "#000" },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#000",
+  },
 });

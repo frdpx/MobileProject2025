@@ -16,7 +16,7 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 import Calendar from "../components/calendar/calendar";
 import { useTransactionStore } from "../store/useTransactions";
 import { useAuthStore } from "../store/useAuthStore";
@@ -44,7 +44,10 @@ const Dropdown = ({ items, value, onChangeValue, style }) => {
   const selectedLabel = items.find((i) => i.value === value)?.label || "Select";
   return (
     <View style={[styles.dropdownContainer, style]}>
-      <Pressable style={styles.dropdownButton} onPress={() => setOpen((p) => !p)}>
+      <Pressable
+        style={styles.dropdownButton}
+        onPress={() => setOpen((p) => !p)}
+      >
         <Text style={styles.dropdownButtonText}>{selectedLabel}</Text>
       </Pressable>
       {open && (
@@ -83,17 +86,27 @@ export const AddTransactionsScreen = () => {
   const [categoryOptions, setCategoryOptions] = useState(
     (transaction?.type || "income") === "income" ? incomeMenu : expensesMenu
   );
-  const [category, setCategory] = useState(transaction?.category || incomeMenu[0].value);
-  const [date, setDate] = useState(transaction?.date ? new Date(transaction.date) : new Date());
-  const [amount, setAmount] = useState(transaction ? String(Math.round(transaction.amount * 100)) : "0");
+  const [category, setCategory] = useState(
+    transaction?.category || incomeMenu[0].value
+  );
+  const [date, setDate] = useState(
+    transaction?.date ? new Date(transaction.date) : new Date()
+  );
+  const [amount, setAmount] = useState(
+    transaction ? String(Math.round(transaction.amount * 100)) : "0"
+  );
   const [comment, setComment] = useState(transaction?.comment || "");
 
   const amountFont = Math.round(Math.min(width * 0.12, height * 0.06));
 
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   useEffect(() => {
-    const sh = Keyboard.addListener("keyboardDidShow", () => setKeyboardOpen(true));
-    const hi = Keyboard.addListener("keyboardDidHide", () => setKeyboardOpen(false));
+    const sh = Keyboard.addListener("keyboardDidShow", () =>
+      setKeyboardOpen(true)
+    );
+    const hi = Keyboard.addListener("keyboardDidHide", () =>
+      setKeyboardOpen(false)
+    );
     return () => {
       sh.remove();
       hi.remove();
@@ -120,7 +133,13 @@ export const AddTransactionsScreen = () => {
       return;
     }
     const value = parseFloat((parseInt(amount, 10) / 100).toFixed(2));
-    const newTransaction = { type, category, date: date.toISOString(), amount: value, comment };
+    const newTransaction = {
+      type,
+      category,
+      date: date.toISOString(),
+      amount: value,
+      comment,
+    };
 
     try {
       if (mode === "edit" && transaction) {
@@ -155,7 +174,6 @@ export const AddTransactionsScreen = () => {
       >
         <Pressable style={styles.flex1} onPress={Keyboard.dismiss}>
           <View style={styles.container}>
- 
             <View style={styles.topBar}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
@@ -169,7 +187,7 @@ export const AddTransactionsScreen = () => {
               <Text style={styles.headerText}>
                 {mode === "edit" ? "Edit Transaction" : "Add Transaction"}
               </Text>
-              {/* spacer ให้ title อยู่กลางจริง ๆ */}
+
               <View style={{ width: 26 }} />
             </View>
 
@@ -227,7 +245,12 @@ export const AddTransactionsScreen = () => {
                           else handlePressNumber(key);
                         }}
                       >
-                        <Text style={[styles.numText, key === "→" && styles.saveArrowText]}>
+                        <Text
+                          style={[
+                            styles.numText,
+                            key === "→" && styles.saveArrowText,
+                          ]}
+                        >
                           {key}
                         </Text>
                       </Pressable>
@@ -246,7 +269,9 @@ export const AddTransactionsScreen = () => {
               returnKeyType="done"
               blurOnSubmit
               onSubmitEditing={Keyboard.dismiss}
-              inputAccessoryViewID={Platform.OS === "ios" ? commentAccessoryId : undefined}
+              inputAccessoryViewID={
+                Platform.OS === "ios" ? commentAccessoryId : undefined
+              }
             />
 
             {Platform.OS === "ios" && (
@@ -261,17 +286,14 @@ export const AddTransactionsScreen = () => {
 
             {Platform.OS === "android" && keyboardOpen && (
               <View style={styles.androidBar}>
-                <TouchableOpacity onPress={Keyboard.dismiss} style={styles.androidCloseBtn}>
+                <TouchableOpacity
+                  onPress={Keyboard.dismiss}
+                  style={styles.androidCloseBtn}
+                >
                   <Text style={styles.androidCloseText}>Close keyboard</Text>
                 </TouchableOpacity>
               </View>
             )}
-{/* 
-            {mode === "edit" && (
-              <Pressable style={styles.deleteFullButton} onPress={handleDelete}>
-                <Text style={styles.deleteText}>Delete</Text>
-              </Pressable>
-            )} */}
           </View>
         </Pressable>
       </KeyboardAvoidingView>
@@ -282,8 +304,13 @@ export const AddTransactionsScreen = () => {
 const CIRCLE = 76;
 
 const styles = StyleSheet.create({
-  flex1: { flex: 1 },
-  safe: { flex: 1, backgroundColor: "#f9f9f9" },
+  flex1: {
+    flex: 1,
+  },
+  safe: {
+    flex: 1,
+    backgroundColor: "#f9f9f9",
+  },
 
   container: {
     flex: 1,
@@ -320,8 +347,16 @@ const styles = StyleSheet.create({
     position: "relative",
     elevation: 20,
   },
-  typeDropdown: { flex: 0.4, backgroundColor: "#e6f3ff", borderRadius: 10 },
-  categoryDropdown: { flex: 0.6, backgroundColor: "#e0f7f3", borderRadius: 10 },
+  typeDropdown: {
+    flex: 0.4,
+    backgroundColor: "#e6f3ff",
+    borderRadius: 10,
+  },
+  categoryDropdown: {
+    flex: 0.6,
+    backgroundColor: "#e0f7f3",
+    borderRadius: 10,
+  },
 
   calendarWrapper: {
     width: "100%",
@@ -355,10 +390,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  numText: { fontSize: 22, fontWeight: "bold", color: "#333" },
-  resetButton: { backgroundColor: "#f9c0c0" },
-  saveButton: { backgroundColor: "#000" },
-  saveArrowText: { color: "#fff", fontSize: 22, fontWeight: "bold" },
+  numText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  resetButton: {
+    backgroundColor: "#f9c0c0",
+  },
+  saveButton: {
+    backgroundColor: "#000",
+  },
+  saveArrowText: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
 
   commentInput: {
     borderWidth: 1,
@@ -377,8 +424,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingRight: 8,
   },
-  doneBtn: { paddingVertical: 10, paddingHorizontal: 16 },
-  doneText: { color: "#007aff", fontWeight: "600", fontSize: 16 },
+  doneBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  doneText: {
+    color: "#007aff",
+    fontWeight: "600",
+    fontSize: 16,
+  },
 
   androidBar: {
     alignItems: "flex-end",
@@ -390,9 +444,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     borderRadius: 8,
   },
-  androidCloseText: { color: "#fff", fontWeight: "600" },
+  androidCloseText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
 
-  dropdownContainer: { position: "relative" },
+  dropdownContainer: {
+    position: "relative",
+  },
   dropdownButton: {
     padding: 12,
     borderRadius: 10,
@@ -400,7 +459,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
-  dropdownButtonText: { fontSize: 16, color: "#333" },
+  dropdownButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
   dropdownMenu: {
     position: "absolute",
     top: "100%",
@@ -413,8 +475,13 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     zIndex: 1000,
   },
-  dropdownItem: { padding: 12 },
-  dropdownItemText: { fontSize: 16, color: "#333" },
+  dropdownItem: {
+    padding: 12,
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: "#333",
+  },
 
   deleteFullButton: {
     backgroundColor: "#f5e0a6",
@@ -424,5 +491,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  deleteText: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  deleteText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+  },
 });

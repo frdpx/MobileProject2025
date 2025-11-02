@@ -56,13 +56,11 @@ export const SignUpSreen = () => {
     }
 
     try {
-      // ป้องกัน dob เป็น undefined หรือ parse ไม่ได้
       if (!(dob instanceof Date) || isNaN(dob.getTime())) {
         Alert.alert("Error", "กรุณาเลือกวันเกิดให้ถูกต้อง");
         return;
       }
 
-      // เก็บแบบ date-only ไม่ผูก timezone (กันเพี้ยน -1 วัน)
       const y = dob.getFullYear();
       const m = String(dob.getMonth() + 1).padStart(2, "0");
       const d = String(dob.getDate()).padStart(2, "0");
@@ -73,7 +71,7 @@ export const SignUpSreen = () => {
         lastName: lastname,
         email,
         mobile,
-        dateOfBirth, // << ส่งสตริง YYYY-MM-DD เข้าไป
+        dateOfBirth,
         password,
       });
 
@@ -93,7 +91,6 @@ export const SignUpSreen = () => {
       <KeyboardAvoidingView
         style={styles.flex1}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        // ถ้าหัวมี Header สูง ๆ ปรับ offset ได้ เช่น 8–24
         keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
       >
         {/* แตะพื้นหลังเพื่อปิดคีย์บอร์ด */}
@@ -105,8 +102,8 @@ export const SignUpSreen = () => {
               style={{ flex: 1 }}
               contentContainerStyle={{
                 paddingBottom: 40,
-                rowGap: 12,  
-          }}
+                rowGap: 12,
+              }}
               keyboardShouldPersistTaps="handled"
             >
               <FormInput
@@ -152,7 +149,6 @@ export const SignUpSreen = () => {
                 }
               />
 
-              {/* แถบ Done สำหรับ iOS number-pad */}
               {Platform.OS === "ios" && (
                 <InputAccessoryView nativeID={accessoryId}>
                   <View style={styles.accessoryBar}>
@@ -166,7 +162,6 @@ export const SignUpSreen = () => {
                 </InputAccessoryView>
               )}
 
-              {/* DOB (ถูกล็อกให้พิมพ์ไม่ได้อยู่แล้ว) */}
               <View style={{ marginBottom: 14 }}>
                 <Calendar label="Date of Birth" value={dob} onChange={setDob} />
               </View>
