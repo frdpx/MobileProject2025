@@ -20,7 +20,7 @@ export const HomeScreen = () => {
   useEffect(() => {
     if (user?.uid) {
       const unsub = listenTransactions(user.uid);
-      return () => unsub && unsub(); // cleanup listener ตอนออกจากหน้า
+      return () => unsub && unsub();
     }
   }, [user]);
 
@@ -42,7 +42,6 @@ export const HomeScreen = () => {
       },
     ]);
   };
-  
 
   return (
     <SafeAreaView style={styles.container}>

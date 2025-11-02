@@ -78,14 +78,14 @@ export const useAuthStore = create((set, get) => ({
 
   updateUser: async (updates) => {
     const { user } = get();
-    if (!user?.uid) return console.warn("⚠️ No user logged in");
+    if (!user?.uid) return console.warn("No user logged in");
 
     try {
       await updateUserProfile(user.uid, updates);
       set({ user: { ...user, ...updates } });
-      console.log("✅ User updated successfully");
+      console.log("User updated successfully");
     } catch (err) {
-      console.error("❌ Failed to update user:", err);
+      console.error("Failed to update user:", err);
     }
   },
 

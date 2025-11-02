@@ -11,7 +11,6 @@ export const calcTotal = (transactions, tab = "total") => {
       .reduce((sum, t) => sum + t.amount, 0);
   }
 
-  // tab === "total"  คำนวณ balance = income - expense
   const income = transactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -23,7 +22,6 @@ export const calcTotal = (transactions, tab = "total") => {
   return income - expense;
 };
 
-// utils/calcTotal.js
 export const calcBalance = (transactions) => {
   const income = transactions
     .filter((t) => t.type === "income")

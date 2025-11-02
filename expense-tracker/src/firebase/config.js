@@ -4,7 +4,7 @@ import {
   getAuth,
   getReactNativePersistence,
 } from "firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // ✅ ต้องแบบนี้
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -16,19 +16,17 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// ใช้ getApps เพื่อป้องกัน re-initialize
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// initializeAuth ต้องอยู่หลังจาก initializeApp เสมอ
 let auth;
 try {
   auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage), // ✅ ใช้ตัวนี้
+    persistence: getReactNativePersistence(AsyncStorage),
   });
-  console.log("✅ Firebase Auth initialized with persistence");
+  console.log("Firebase Auth initialized with persistence");
 } catch (e) {
   auth = getAuth(app);
-  console.log("⚠️ Firebase Auth already initialized, using existing one");
+  console.log("Firebase Auth already initialized, using existing one");
 }
 
 export const db = getFirestore(app);
